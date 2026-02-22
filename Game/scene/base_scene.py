@@ -1,16 +1,16 @@
 class Scene:
     """
-    Basic structure of every scene.
-    All scenes should have:
-    - handle_events()
-    - update()
-    - draw()
+    Base class for all scenes.
+    Scenes should only request a scene change by setting request_scene.
+    Game class performs the actual switch.
     """
 
-    def __init__(self):
-        self.next_scene = None
+    def __init__(self, game):
+        self.game = game
+        self.request_scene = None
+        self.request_quit = False
 
-    def handle_events(self, events):
+    def manage_event(self, events):
         pass
 
     def update(self):

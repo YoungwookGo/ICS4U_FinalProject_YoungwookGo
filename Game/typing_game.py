@@ -10,9 +10,12 @@
 #   Pygame community edition.
 # #####################################
 
-import pygame
 import sys
+import pygame
+
+# Import scene
 from scene.menu_scene import MenuScene
+from scene.game_scene import GameScene
 
 class Game:
     """
@@ -22,54 +25,72 @@ class Game:
     """
 
     def __init__(self):
-        """Initialize game and setting"""
+        """Initialize game"""
 
         # Initialize game engine
         pygame.init()
 
+        self.clock = pygame.time.Clock() # Game clock for frame control
+        self.running = True # Game loop state
+
         # Initialize game screen
-        self.WIDTH = 800
-        self.HEIGHT = 600
+        self.WIDTH = 1024
+        self.HEIGHT = 640
+        self.FPS = 60
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
         pygame.display.set_caption("Typing Game")
 
-        self.clock = pygame.time.Clock() # Game clock for frame control
-
-        self.running = True # Game state
-
-        self.scene = MenuScene(self.WIDTH, self.HEIGHT) # Initial scene
+        # Initialize game scene
+        self._register_scene()
+        self.scene = self.scene_registry["menu"]
 
     def run(self):
+        """Main game loop"""
 
         while self.running:
+            event = pygame.event.get()
 
-            events = pygame.event.get()
-
-            self.scene.handle_events(events)
+            self.scene.manage_event(event)
             self.scene.update()
             self.scene.draw(self.screen)
 
             pygame.display.flip()
-
-            self.change_scene_conditional()
+            self._manage_scene()
 
             self.clock.tick(60)
 
         # Quit game loop when loop ends
         self.quit()
 
-    def change_scene_conditional(self):
-        if self.scene.next_scene is None:
-            return
+    def _register_scene(self):
+        """Register all scenes, only for initialize"""
 
-        if self.scene.next_scene is False:
+        self.scene_registry = {}
+
+        self.scene_registry["menu"] = MenuScene(self)
+        self.scene_registry["game"] = GameScene(self)
+
+    def _manage_scene(self):
+        """Switch scene if requested"""
+
+        # Quit request
+        if self.scene.request_quit:
             self.running = False
             return
 
-        self.scene = self.scene.next_scene
+        # Scene change request
+        scene_key = self.scene.request_scene
+
+        if scene_key is None:
+            return
+
+        if scene_key in self.scene_registry:
+            self.scene.request_scene = None
+            self.scene = self.scene_registry[scene_key]
 
     def quit(self):
         """Close the game"""
+
         pygame.quit()
         sys.exit()
 
