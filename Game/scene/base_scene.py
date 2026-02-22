@@ -1,3 +1,5 @@
+import pygame
+
 class Scene:
     """
     Base class for all scenes.
@@ -11,7 +13,9 @@ class Scene:
         self.request_quit = False
 
     def manage_event(self, events):
-        pass
+        for event in events:
+            if event.type == pygame.QUIT:
+                self.request_quit = True
 
     def update(self):
         pass

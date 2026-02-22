@@ -34,11 +34,14 @@ class Game:
         self.running = True # Game loop state
 
         # Initialize game screen
-        self.WIDTH = 1024
-        self.HEIGHT = 640
+        self.WIDTH = 1600
+        self.HEIGHT = 900
         self.FPS = 60
-        self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
         pygame.display.set_caption("Typing Game")
+        self.screen = pygame.display.set_mode(
+            (self.WIDTH, self.HEIGHT),
+            pygame.RESIZABLE
+        )
 
         # Initialize game scene
         self.scene = MenuScene(self)
@@ -81,6 +84,8 @@ class Game:
             self.scene = GameScene(self)
         else:
             print("Invalid scene request: ", scene_key)
+
+        self.scene.request_scene = None
 
 
     def quit(self):

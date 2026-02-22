@@ -10,7 +10,9 @@ class GameScene(Scene):
         super().__init__(game)
         self.font = pygame.font.SysFont(None, 36)
 
-    def manage_events(self, events):
+    def manage_event(self, events):
+        super().manage_event(events)
+
         for event in events:
             if event.type == pygame.QUIT:
                 self.request_quit = True
@@ -27,6 +29,4 @@ class GameScene(Scene):
         pass
 
     def draw(self, screen):
-        screen.fill((0, 0, 0))
-        text = self.font.render("GAME: ESC = Menu", True, (255, 255, 255))
-        screen.blit(text, (20, 20))
+        pass
