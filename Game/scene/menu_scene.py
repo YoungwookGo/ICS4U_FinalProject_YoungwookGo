@@ -3,7 +3,7 @@ from scene.base_scene import Scene
 
 class MenuScene(Scene):
     """
-    Game menu scene class for the program.
+    Game menu scene class for the program.c
     """
 
     def __init__(self, game):
