@@ -10,7 +10,7 @@ class GameScene(Scene):
         super().__init__(game)
         self.font = pygame.font.SysFont(None, 36)
 
-    def handle_events(self, events):
+    def manage_events(self, events):
         for event in events:
             if event.type == pygame.QUIT:
                 self.request_quit = True

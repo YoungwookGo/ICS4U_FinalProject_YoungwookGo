@@ -41,8 +41,7 @@ class Game:
         pygame.display.set_caption("Typing Game")
 
         # Initialize game scene
-        self._register_scene()
-        self.scene = self.scene_registry["menu"]
+        self.scene = MenuScene(self)
 
     def run(self):
         """Main game loop"""
@@ -55,22 +54,14 @@ class Game:
             self.scene.draw(self.screen)
 
             pygame.display.flip()
-            self._manage_scene()
+            self.manage_scene()
 
-            self.clock.tick(60)
+            self.clock.tick(self.FPS)
 
         # Quit game loop when loop ends
         self.quit()
 
-    def _register_scene(self):
-        """Register all scenes, only for initialize"""
-
-        self.scene_registry = {}
-
-        self.scene_registry["menu"] = MenuScene(self)
-        self.scene_registry["game"] = GameScene(self)
-
-    def _manage_scene(self):
+    def manage_scene(self):
         """Switch scene if requested"""
 
         # Quit request
@@ -84,9 +75,13 @@ class Game:
         if scene_key is None:
             return
 
-        if scene_key in self.scene_registry:
-            self.scene.request_scene = None
-            self.scene = self.scene_registry[scene_key]
+        if scene_key == "menu":
+            self.scene = MenuScene(self)
+        elif scene_key == "game":
+            self.scene = GameScene(self)
+        else:
+            print("Invalid scene request: ", scene_key)
+
 
     def quit(self):
         """Close the game"""
