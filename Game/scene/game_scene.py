@@ -1,6 +1,7 @@
 import pygame
 from scene.base_scene import Scene
 from entity.text_box import TextBox
+from utility.random_word import RandomWord
 
 class GameScene(Scene):
     """
@@ -19,6 +20,12 @@ class GameScene(Scene):
             idle_color=(70, 70, 80),
             active_color=(110, 110, 130),
         )
+
+        self.word_api = RandomWord()
+        self.current_word = self.word_api.get_word()
+        
+        print("Random word:", self.current_word)
+        
 
     def manage_event(self, events):
         super().manage_event(events)
