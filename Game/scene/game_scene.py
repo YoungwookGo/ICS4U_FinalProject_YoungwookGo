@@ -8,7 +8,6 @@ class GameScene(Scene):
 
     def __init__(self, game):
         super().__init__(game)
-        self.font = pygame.font.SysFont(None, 36)
 
     def manage_event(self, events):
         super().manage_event(events)
@@ -16,14 +15,6 @@ class GameScene(Scene):
         for event in events:
             if event.type == pygame.QUIT:
                 self.request_quit = True
-
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    # 선택 1) 게임 종료
-                    # self.request_quit = True
-
-                    # 선택 2) 메뉴로 돌아가기 (추천)
-                    self.request_scene = "menu"
 
     def update(self):
         pass
