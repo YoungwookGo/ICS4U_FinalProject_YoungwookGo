@@ -1,6 +1,6 @@
 import pygame
 from scene.base_scene import Scene
-from entities.button import Button
+from entity.button import Button
 
 class MenuScene(Scene):
     """
@@ -24,7 +24,7 @@ class MenuScene(Scene):
             size=(220, 70),
             text_color=(0, 0, 0),
             idle_color=(200, 200, 200),
-            hover_color=(255, 255, 255),
+            active_color=(255, 255, 255),
         )
 
         self.quit_button = Button(
@@ -33,7 +33,7 @@ class MenuScene(Scene):
             size=(220, 70),
             text_color=(255, 255, 255),
             idle_color=(170, 50, 50),
-            hover_color=(220, 70, 70),
+            active_color=(220, 70, 70),
         )
 
 
