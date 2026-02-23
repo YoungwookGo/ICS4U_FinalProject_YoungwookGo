@@ -40,6 +40,7 @@ class Enemy(pygame.sprite.Sprite):
             y = self.rect.centery
 
         self.word = new_word
+        self.speed = self.calculate_speed(self.word)
         self.image = self.font.render(self.word, True, (255, 255, 255))
         self.rect = self.image.get_rect(midleft=(-20, y))
         

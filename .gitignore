@@ -18,4 +18,7 @@ venv/
 
 # Project drafts
 Concept/
+
+# Miscellaneous
+Game/game_stats.json
 EOF

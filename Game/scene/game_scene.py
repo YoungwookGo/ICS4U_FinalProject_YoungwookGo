@@ -2,7 +2,9 @@ import pygame
 from scene.base_scene import Scene
 from utility.text_box import TextBox
 from utility.random_word import RandomWord
+from utility.statistic import StatsManager
 from entity.enemy1 import Enemy1
+
 
 class GameScene(Scene):
     """
@@ -26,6 +28,7 @@ class GameScene(Scene):
 
         # Utilities -----------------------------
         self.word_api = RandomWord()
+        self.stats = StatsManager()
 
         # Entities ------------------------------
         self.enemies = pygame.sprite.Group()
@@ -97,7 +100,11 @@ class GameScene(Scene):
                 enemy.passed = False
 
             if self.hp <= 0:
+                # Game over
                 self.request_scene = "menu"
+                # Statistics renewal
+                self.stats.increment_total_games()
+                new_record = self.stats.submit_score(self.score)
                 return
 
     def draw(self, screen):
