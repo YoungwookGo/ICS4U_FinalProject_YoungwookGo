@@ -19,7 +19,8 @@ class Button:
         self.rect = pygame.Rect(0, 0, size[0], size[1])
         self.text_surface = self.font.render(self.text, True, self.text_color)
 
-    def center(self, x, y):
+    def locate(self, x, y):
+        # Set location of the button's center
         self.rect.center = (x, y)
 
     def interact(self, event):

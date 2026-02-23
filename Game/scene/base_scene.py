@@ -4,7 +4,6 @@ class Scene:
     """
     Base class for all scenes.
     Scenes should only request a scene change by setting request_scene.
-    Game class performs the actual switch.
     """
 
     def __init__(self, game):

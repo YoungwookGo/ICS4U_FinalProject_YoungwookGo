@@ -1,7 +1,8 @@
 import pygame
 from scene.base_scene import Scene
-from entity.text_box import TextBox
+from utility.text_box import TextBox
 from utility.random_word import RandomWord
+from entity.enemy1 import Enemy1
 
 class GameScene(Scene):
     """
@@ -11,20 +12,27 @@ class GameScene(Scene):
     def __init__(self, game):
         super().__init__(game)
 
-        self.font = pygame.font.Font("Game/asset/font/NotoSans-Medium.ttf", 42)
+        # Visuals ----------
+        self.font = pygame.font.Font("Game/asset/font/NotoSans-Medium.ttf", 48)
 
         self.text_box = TextBox(
             font=self.font,
-            size=(520, 70),
+            size=(1000, 80),
             text_color=(255, 255, 255),
             idle_color=(70, 70, 80),
             active_color=(110, 110, 130),
         )
 
+        # Utilities ----------
         self.word_api = RandomWord()
-        self.current_word = self.word_api.get_word()
-        
-        print("Random word:", self.current_word)
+
+        # Entities ----------
+        self.enemies = pygame.sprite.Group()
+        for i in range(3):
+            word = self.word_api.get_word() or "offline"
+            y = 200 + i * 120
+            enemy = Enemy1(self.game, word, y)
+            self.enemies.add(enemy)
         
 
     def manage_event(self, events):
@@ -39,7 +47,8 @@ class GameScene(Scene):
                 print("Typed:", self.text_box.text)
 
     def update(self):
-        pass
+        dt = self.game.clock.get_time() / 1000  # milliseconds -> seconds
+        self.enemies.update(dt)
 
     def draw(self, screen):
         # Reset screen
@@ -50,5 +59,8 @@ class GameScene(Scene):
         center_y = self.game.HEIGHT // 2
 
         # Text box
-        self.text_box.center(center_x, center_y)
+        self.text_box.locate(center_x, self.game.HEIGHT - 80)
         self.text_box.draw(screen)
+
+        # Enemy
+        self.enemies.draw(screen)

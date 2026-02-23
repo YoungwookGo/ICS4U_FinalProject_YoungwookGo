@@ -19,12 +19,13 @@ class TextBox:
         self.rect = pygame.Rect(0, 0, size[0], size[1])
         self.active = True
 
-    def center(self, x, y):
+    def locate(self, x, y):
+        # Set location of the text box's center
         self.rect.center = (x, y)
 
     def interact(self, event):
 
-        # Activates when user click
+        # Re-activates when user click
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             self.active = self.rect.collidepoint(event.pos)
 

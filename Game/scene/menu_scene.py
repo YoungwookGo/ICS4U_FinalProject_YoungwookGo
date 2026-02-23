@@ -1,6 +1,6 @@
 import pygame
 from scene.base_scene import Scene
-from entity.button import Button
+from utility.button import Button
 
 class MenuScene(Scene):
     """
@@ -66,8 +66,8 @@ class MenuScene(Scene):
         screen.blit(self.title_surface, title_rect)
 
         # ----- Button -----
-        self.start_button.center(center_x, center_y + 20)
+        self.start_button.locate(center_x, center_y + 20)
         self.start_button.draw(screen)
 
-        self.quit_button.center(center_x, center_y + 110)
+        self.quit_button.locate(center_x, center_y + 110)
         self.quit_button.draw(screen)
