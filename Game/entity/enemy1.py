@@ -11,5 +11,5 @@ class Enemy1(Enemy):
             word=word,
             x=-20,
             y=y,
-            speed=120,
+            base_speed=120,
         )

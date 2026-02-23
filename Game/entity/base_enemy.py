@@ -7,15 +7,17 @@ class Enemy(pygame.sprite.Sprite):
     Handle movement and visual.
     """
 
-    def __init__(self, game, word, x, y, speed):
+    def __init__(self, game, word, x, y, base_speed):
         super().__init__()
         
         self.game = game
-        self.speed = speed
+        self.base_speed = base_speed
 
         self.font = pygame.font.Font("Game/asset/font/NotoSans-SemiBold.ttf", 40)
 
         self.word = word
+        self.speed = self.calculate_speed(self.word)
+
         self.image = self.font.render(self.word, True, (255, 255, 255))
         self.rect = self.image.get_rect(midleft=(x, y))
 
@@ -43,3 +45,19 @@ class Enemy(pygame.sprite.Sprite):
         
         self._x = float(self.rect.x)
         self.passed = False
+
+    def calculate_speed(self, word: str) -> float:
+        target_len = 6
+        min_speed = 30
+        max_speed = 200
+
+        L = max(1, len(word))
+        speed = self.base_speed * (target_len / L)
+
+        # clamp
+        if speed < min_speed:
+            speed = min_speed
+        elif speed > max_speed:
+            speed = max_speed
+
+        return speed
