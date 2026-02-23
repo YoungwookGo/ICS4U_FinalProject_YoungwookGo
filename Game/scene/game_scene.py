@@ -39,12 +39,32 @@ class GameScene(Scene):
         super().manage_event(events)
 
         for event in events:
-            if event.type == pygame.QUIT:
-                self.request_quit = True
-
+            # Check text enter
             result = self.text_box.interact(event)
             if result == "enter":
                 print("Typed:", self.text_box.text)
+                self.check_input()
+
+    def check_input(self):
+        text_input = self.text_box.text.strip().lower()
+
+        if text_input == "":
+            return
+
+        for enemy in self.enemies:
+            if enemy.word.lower() == text_input:
+                y = enemy.rect.centery
+                enemy.kill()
+
+                new_word = self.word_api.get_word() or "OHNO"
+                self.enemies.add(Enemy1(self.game, new_word, y))
+                print("Typed right")
+                break
+        else:
+            # Runs when for loop don't breaks
+            print("Typed wrong")
+
+        self.text_box.text = ""
 
     def update(self):
         dt = self.game.clock.get_time() / 1000  # milliseconds -> seconds
