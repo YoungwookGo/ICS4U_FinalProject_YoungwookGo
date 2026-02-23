@@ -39,8 +39,8 @@ class GameScene(Scene):
         self.score = 0
         self.combo = 0
         self.max_combo = 0
-
-        
+        self.max_hp = 5
+        self.hp = self.max_hp
 
     def manage_event(self, events):
         super().manage_event(events)
@@ -87,6 +87,19 @@ class GameScene(Scene):
         dt = self.game.clock.get_time() / 1000  # milliseconds -> seconds
         self.enemies.update(dt)
 
+        for enemy in self.enemies:
+            if enemy.passed:
+                self.hp -= 1
+
+                new_word = self.word_api.get_word() or "offline"
+                enemy.reset(new_word, enemy.rect.centery)
+
+                enemy.passed = False
+
+            if self.hp <= 0:
+                self.request_scene = "menu"
+                return
+
     def draw(self, screen):
         # Reset screen
         screen.fill((10, 10, 15))
@@ -106,7 +119,9 @@ class GameScene(Scene):
         score_surf = self.ui_font.render(f"Score: {self.score}", True, (255, 255, 255))
         combo_surf = self.ui_font.render(f"Combo: {self.combo}", True, (255, 255, 255))
         comboM_surf = self.ui_font.render(f"Max Combo: {self.max_combo}", True, (255, 255, 255))
+        hp_surf = self.ui_font.render(f"HP: {self.hp}/{self.max_hp}", True, (255, 255, 255))
 
         screen.blit(score_surf, (15, 10))
         screen.blit(combo_surf, (15, 50))
         screen.blit(comboM_surf, (15, 90))
+        screen.blit(hp_surf, (15, 130))
