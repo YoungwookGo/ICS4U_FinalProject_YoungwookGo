@@ -5,7 +5,7 @@ class RandomWord:
     Fetch a random english word from online API.
     """
 
-    API_URL = "https://random-word-api.herokuapp.com/canada"
+    API_URL = "https://random-word-api.herokuapp.com/word"
 
     def __init__(self):
         pass
