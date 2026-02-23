@@ -33,7 +33,7 @@ class GameScene(Scene):
         # Entities ------------------------------
         self.enemies = pygame.sprite.Group()
         for i in range(3):
-            word = self.word_api.get_word() or "offline"
+            word = self.word_api.get_word() or "OHNO"
             y = 200 + i * 120
             enemy = Enemy1(self.game, word, y)
             self.enemies.add(enemy)
@@ -64,12 +64,12 @@ class GameScene(Scene):
         for enemy in self.enemies:
             if enemy.word.lower() == text_input:
                 # Score manage
+                gained = 10 + self.combo
+                self.score += gained
+
                 self.combo += 1
                 if self.combo > self.max_combo:
                     self.max_combo = self.combo
-
-                gained = 10 + self.combo
-                self.score += gained
 
                 # Game function
                 y = enemy.rect.centery
@@ -94,7 +94,7 @@ class GameScene(Scene):
             if enemy.passed:
                 self.hp -= 1
 
-                new_word = self.word_api.get_word() or "offline"
+                new_word = self.word_api.get_word() or "OHNO"
                 enemy.reset(new_word, enemy.rect.centery)
 
                 enemy.passed = False
