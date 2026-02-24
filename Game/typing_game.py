@@ -34,8 +34,8 @@ class Game:
         self.running = True # Game loop state
 
         # Initialize game screen
-        self.WIDTH = 1600
-        self.HEIGHT = 900
+        self.WIDTH = 1280
+        self.HEIGHT = 720
         self.FPS = 60
         pygame.display.set_caption("Typing Game")
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
