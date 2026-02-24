@@ -30,7 +30,7 @@ class Game:
         # Initialize game engine
         pygame.init()
 
-        self.clock = pygame.time.Clock() # Game clock for frame control
+        self.clock = pygame.time.Clock() # Game clock
         self.running = True # Game loop state
 
         # Initialize game screen
