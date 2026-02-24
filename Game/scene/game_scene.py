@@ -77,12 +77,10 @@ class GameScene(Scene):
 
                 new_word = self.word_api.get_word() or "OHNO"
                 self.enemies.add(Enemy1(self.game, new_word, y))
-                print("Typed right")
                 break
         else:
             # Runs when for loop don't breaks
             self.combo = 0
-            print("Typed wrong")
 
         self.text_box.text = ""
 
@@ -123,12 +121,10 @@ class GameScene(Scene):
         self.enemies.draw(screen)
 
         # UI
+        hp_surf = self.ui_font.render(f"HP: {self.hp}/{self.max_hp}", True, (255, 255, 255))
         score_surf = self.ui_font.render(f"Score: {self.score}", True, (255, 255, 255))
         combo_surf = self.ui_font.render(f"Combo: {self.combo}", True, (255, 255, 255))
-        comboM_surf = self.ui_font.render(f"Max Combo: {self.max_combo}", True, (255, 255, 255))
-        hp_surf = self.ui_font.render(f"HP: {self.hp}/{self.max_hp}", True, (255, 255, 255))
 
-        screen.blit(score_surf, (15, 10))
-        screen.blit(combo_surf, (15, 50))
-        screen.blit(comboM_surf, (15, 90))
-        screen.blit(hp_surf, (15, 130))
+        screen.blit(hp_surf, (20, 10))
+        screen.blit(score_surf, (200, 10))
+        screen.blit(combo_surf, (400, 10))

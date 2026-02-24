@@ -38,10 +38,7 @@ class Game:
         self.HEIGHT = 900
         self.FPS = 60
         pygame.display.set_caption("Typing Game")
-        self.screen = pygame.display.set_mode(
-            (self.WIDTH, self.HEIGHT),
-            pygame.RESIZABLE
-        )
+        self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
 
         # Initialize game scene
         self.scene = MenuScene(self)
