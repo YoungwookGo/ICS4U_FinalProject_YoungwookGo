@@ -19,9 +19,26 @@ class TextBox:
         self.rect = pygame.Rect(0, 0, size[0], size[1])
         self.active = True
 
+        self.cursor_timer = 0
+        self.cursor_interval = 0.5
+        self.cursor_visible = True
+
     def locate(self, x, y):
         # Set location of the text box's center
         self.rect.center = (x, y)
+
+    def update(self, dt):
+        """
+        Update cursor blinking using delta time.
+        """
+        if not self.active:
+            return
+
+        self.cursor_timer += dt
+
+        if self.cursor_timer >= self.cursor_interval:
+            self.cursor_timer = 0
+            self.cursor_visible = not self.cursor_visible
 
     def interact(self, event):
 
@@ -48,9 +65,27 @@ class TextBox:
         return None
     
     def draw(self, screen):
+
         color = self.active_color if self.active else self.idle_color
         pygame.draw.rect(screen, color, self.rect, border_radius=8)
 
         padding_x = 12
+
+        # Draw text
         text_surface = self.font.render(self.text, True, self.text_color)
-        screen.blit(text_surface, (self.rect.x + padding_x, self.rect.y + (self.rect.height - text_surface.get_height()) // 2))
+        text_y = self.rect.y + (self.rect.height - text_surface.get_height()) // 2
+        screen.blit(text_surface, (self.rect.x + padding_x, text_y))
+
+        # --- Draw cursor ---
+        if self.active and self.cursor_visible:
+            cursor_x = self.rect.x + padding_x + text_surface.get_width() + 3
+            cursor_y = text_y + 5
+            cursor_height = text_surface.get_height() - 10
+
+            pygame.draw.line(
+                screen,
+                self.text_color,
+                (cursor_x, cursor_y),
+                (cursor_x, cursor_y + cursor_height),
+                3
+            )
