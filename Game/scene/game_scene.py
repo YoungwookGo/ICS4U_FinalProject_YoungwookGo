@@ -1,4 +1,5 @@
 import pygame
+import os
 from scene.base_scene import Scene
 from utility.text_box import TextBox
 from utility.random_word import RandomWord
@@ -20,8 +21,40 @@ class GameScene(Scene):
         self.stats = StatsManager()
 
         # Font ----------------------------------
-        self.input_font = pygame.font.Font("Game/asset/font/NotoSans-Medium.ttf", 48)
-        self.ui_font = pygame.font.Font("Game/asset/font/NotoSans-SemiBold.ttf", 32)
+        self.input_font = pygame.font.Font(
+            os.path.join("Game", "asset", "font", "NotoSans-Medium.ttf"), 48)
+        self.ui_font = pygame.font.Font(
+            os.path.join("Game","asset","font","NotoSans-SemiBold.ttf"), 32)
+
+        # Background ----------------------------
+        self.bg_files = [
+            "Solar_gradients_01.jpg",
+            "Solar_gradients_02.jpg",
+            "Solar_gradients_03.jpg",
+            "Solar_gradients_04.jpg",
+            "Solar_gradients_05.jpg",
+            "Solar_gradients_06.jpg",
+            "Solar_gradients_07.jpg",
+            "Solar_gradients_08.jpg",
+            "Solar_gradients_09.jpg",
+            "Solar_gradients_10.jpg",
+            "Solar_gradients_11.jpg",
+            "Solar_gradients_12.jpg",
+            "Solar_gradients_13.jpg",
+            "Solar_gradients_14.jpg",
+            "Solar_gradients_15.jpg",
+            "Solar_gradients_16.jpg",
+        ]
+
+        self.bg_images = []
+
+        for filename in self.bg_files:
+            path = os.path.join("Game", "asset", "wallpaper", filename)
+            img = pygame.image.load(path).convert()
+            img = pygame.transform.scale(img, (self.game.WIDTH, self.game.HEIGHT))
+            self.bg_images.append(img)
+
+        self.background = self.bg_images[0]
 
         # UI ------------------------------------
         self.text_box = TextBox(
@@ -84,6 +117,8 @@ class GameScene(Scene):
                 self.kill_count +=1
                 if self.kill_count >= self.stage * 20:
                     self.stage = self.kill_count // 20 + 1
+                    bg_idx = (self.stage - 1) % len(self.bg_images)
+                    self.background = self.bg_images[bg_idx]
 
                 # Reset enemy -----------------
                 new_word = self.word_api.get_word() or "ohno"
@@ -120,8 +155,8 @@ class GameScene(Scene):
                 return
 
     def draw(self, screen):
-        # Reset screen
-        screen.fill((10, 10, 15))
+        # Draw background image
+        screen.blit(self.background, (0, 0))
 
         # Define center guideline
         center_x = self.game.WIDTH // 2
