@@ -7,6 +7,7 @@ from utility.random_word import RandomWord
 from utility.statistic import StatsManager
 from entity.enemy1 import Enemy1
 from entity.enemy2 import Enemy2
+from entity.enemy3 import Enemy3
 
 
 class GameScene(Scene):
@@ -72,7 +73,7 @@ class GameScene(Scene):
         for i in range(3):
             word = self.word_api.get_word() or "ohno"
             y = 200 + i * 120
-            enemy = Enemy1(self.game, word, y)
+            enemy = Enemy1(self.game, y, word)
             self.enemies.add(enemy)
 
         # Game variables ------------------------
@@ -108,7 +109,7 @@ class GameScene(Scene):
                 print("Typed:", self.text_box.text)
                 self.check_input()
 
-    # =============================================================================================
+    # ====================================================================
 
     def check_input(self):
         # Case sensitive
@@ -120,18 +121,20 @@ class GameScene(Scene):
 
         # Check each enemy with user input
         for enemy in self.enemies:
-            if enemy.word.lower() == text_input:
-                # Common events on enemy defeat
-                self.defeat_enemy(enemy)
+            if enemy.word == text_input:
+                died = enemy.take_damage()
 
-                # Energy increases only when user defeat enemy by typing
-                self.energy += 10
+                if died:
+                    # Common events on enemy defeat
+                    self.defeat_enemy(enemy)
 
-                # Combo increases only when user defeat enemy by typing
-                self.combo += 1
-                if self.combo > self.max_combo:
-                    self.max_combo = self.combo
+                    # Energy increases only when user defeat enemy by typing
+                    self.energy += 10
 
+                    # Combo increases only when user defeat enemy by typing
+                    self.combo += 1
+                    if self.combo > self.max_combo:
+                        self.max_combo = self.combo
                 break
         else:
             # When there is no word matching with input
@@ -149,7 +152,7 @@ class GameScene(Scene):
         for enemy in self.enemies:
             self.defeat_enemy(enemy)
 
-    # =============================================================================================
+    # ====================================================================
 
     def defeat_enemy(self, enemy):
         """Manage events when an enemy is defeated."""
@@ -180,10 +183,13 @@ class GameScene(Scene):
     def spawn_enemy(self, y):
         new_word = self.word_api.get_word() or "ohno"
 
-        if random.random() < 0.1:
-            return Enemy2(self.game, new_word, y)
+        r = random.random()
+        if r < 0.10:
+            return Enemy3(self.game, y, new_word)
+        elif r < 0.20:
+            return Enemy2(self.game, y, new_word)
         else:
-            return Enemy1(self.game, new_word, y)
+            return Enemy1(self.game, y, new_word)
         
 
     def update(self):

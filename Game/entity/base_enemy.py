@@ -9,37 +9,67 @@ class Enemy(pygame.sprite.Sprite):
 
     BASE_COLOR = (255, 255, 255)
     BASE_SPEED = 120
+    BASE_HP = 1
 
-    def __init__(self, game, word, y):
+    def __init__(self, game, y, word: None):
         # Call initialize method from parent class
         super().__init__()
         
         self.game = game
-        self.word = word
-
         self.font = pygame.font.Font("Game/asset/font/NotoSans-SemiBold.ttf", 40)
 
         self.text_color = self.BASE_COLOR
-        self.speed = self.calculate_speed(self.word)
-
-        start_x = -20
-        self.image = self.font.render(self.word, True, self.text_color)
-        self.rect = self.image.get_rect(midleft=(start_x, y))
-
-        self._x = float(self.rect.x)
+        self.hp = self.BASE_HP
 
         self.passed = False
+        
+        if word is None:
+            self.generate_word()
+        else:
+            self.word = word
+            self.speed = self.calculate_speed(self.word)
+            self._rerender()
 
-    def update(self, dt):
-        # Keep moving right
-        self._x += self.speed * dt
-        self.rect.x = int(self._x)
+        start_x = -20
+        self.rect = self.image.get_rect(midleft=(start_x, y))
+        self._x = float(self.rect.x)
 
-        # Detect if it reached right edge
-        if self.rect.left > self.game.WIDTH:
-            self.passed = True
+    # Word ===============================================================
 
-    def calculate_speed(self, word: str) -> float:
+    def generate_word(self):
+        new_word = self.game.scene.word_api.get_word() or "ohno"
+
+        self.word = new_word
+        self.speed = self.calculate_speed(self.word)
+        self._rerender()
+
+    # Combat =============================================================
+    
+    def take_damage(self):
+        """
+        Called when user types this enemy correctly.
+        Returns True if this hit kills the enemy.
+        """
+        self.hp -= 1
+        if self.hp > 0:
+            self.on_damaged()
+            return False
+        return True
+    
+    def damage_effect(self):
+        """Called when get damage but not dead yet."""
+        return
+    
+    def exit_effect(self, scene):
+        """
+        Called when the player types this enemy correctly.
+        Default is doing nothing. Subclasses override this.
+        """
+        return
+
+    # Movement ===========================================================
+
+    def calculate_speed(self, word: str | None = None) -> float:
         """Calculate enemy speed"""
         base_len = 6
         min_speed = 30
@@ -56,9 +86,16 @@ class Enemy(pygame.sprite.Sprite):
 
         return speed
     
-    def exit_effect(self, scene):
-        """
-        Called when the player types this enemy correctly.
-        Default is doing nothing. Subclasses override this.
-        """
-        return
+    def update(self, dt):
+        # Keep moving right
+        self._x += self.speed * dt
+        self.rect.x = int(self._x)
+
+        # Detect if it reached right edge
+        if self.rect.left > self.game.WIDTH:
+            self.passed = True
+
+    # ====================================================================
+
+    def _rerender(self):
+        self.image = self.font.render(self.word, True, self.text_color)
