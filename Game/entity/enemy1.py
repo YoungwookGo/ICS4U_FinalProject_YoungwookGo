@@ -6,10 +6,4 @@ class Enemy1(Enemy):
     """
 
     def __init__(self, game, word, y):
-        super().__init__(
-            game=game,
-            word=word,
-            x=-20,
-            y=y,
-            base_speed=120,
-        )
+        super().__init__(game, word, y)

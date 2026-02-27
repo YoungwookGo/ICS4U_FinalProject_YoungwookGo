@@ -1,10 +1,12 @@
 import pygame
 import os
+import random
 from scene.base_scene import Scene
 from utility.text_box import TextBox
 from utility.random_word import RandomWord
 from utility.statistic import StatsManager
 from entity.enemy1 import Enemy1
+from entity.enemy2 import Enemy2
 
 
 class GameScene(Scene):
@@ -16,7 +18,7 @@ class GameScene(Scene):
         # Call initialize method from parent class
         super().__init__(game)
 
-        # Utilities -----------------------------
+        # Call utility --------------------------
         self.word_api = RandomWord()
         self.stats = StatsManager()
 
@@ -106,33 +108,29 @@ class GameScene(Scene):
                 print("Typed:", self.text_box.text)
                 self.check_input()
 
-    def check_input(self):
-        text_input = self.text_box.text.strip().lower()
+    # =============================================================================================
 
+    def check_input(self):
+        # Case sensitive
+        text_input = self.text_box.text.strip()
+
+        # Do nothing when text input is empty
         if text_input == "":
             return
 
+        # Check each enemy with user input
         for enemy in self.enemies:
             if enemy.word.lower() == text_input:
-                # Score management --------------
-                gained = 10 + self.combo + (self.stage - 1) 
-                self.score += gained
+                # Common events on enemy defeat
+                self.defeat_enemy(enemy)
 
+                # Energy increases only when user defeat enemy by typing
+                self.energy += 10
+
+                # Combo increases only when user defeat enemy by typing
                 self.combo += 1
                 if self.combo > self.max_combo:
                     self.max_combo = self.combo
-
-                self.kill_count += 1
-                if self.kill_count >= self.stage * 20:
-                    self.stage = self.kill_count // 20 + 1
-                    bg_idx = (self.stage - 1) % len(self.bg_images)
-                    self.background = self.bg_images[bg_idx]
-
-                self.energy += 10
-
-                # Reset enemy -----------------
-                new_word = self.word_api.get_word() or "ohno"
-                enemy.reset(new_word, enemy.rect.centery)
 
                 break
         else:
@@ -145,34 +143,62 @@ class GameScene(Scene):
         """Remove all enemies on screen and respawn them with new words."""
         if self.energy < 100:
             return  # not ready
-
-        self.energy= 0
+    
+        self.energy -= 100
 
         for enemy in self.enemies:
-            new_word = self.word_api.get_word() or "ohno"
-            enemy.reset(new_word, enemy.rect.centery)
+            self.defeat_enemy(enemy)
 
-            gained = 10 + self.combo + (self.stage - 1) 
-            self.score += gained
-            
-            self.kill_count += 1
-            if self.kill_count >= self.stage * 20:
-                    self.stage = self.kill_count // 20 + 1
-                    bg_idx = (self.stage - 1) % len(self.bg_images)
-                    self.background = self.bg_images[bg_idx]
+    # =============================================================================================
 
+    def defeat_enemy(self, enemy):
+        """Manage events when an enemy is defeated."""
+
+        # Manage score
+        gained = 10 + self.combo + (self.stage - 1) 
+        self.score += gained
+
+        # Manage statistics
+        self.kill_count += 1
+
+        # Manage background
+        if self.kill_count >= self.stage * 20:
+            self.stage = self.kill_count // 20 + 1
+            bg_idx = (self.stage - 1) % len(self.bg_images)
+            self.background = self.bg_images[bg_idx]
+
+        # Manage loot and exit effect
+        enemy.exit_effect(self)
+
+        # Reset enemy
+        y = enemy.rect.centery
+        enemy.kill()
+        new_enemy = self.spawn_enemy(y)
+        self.enemies.add(new_enemy)
+
+
+    def spawn_enemy(self, y):
+        new_word = self.word_api.get_word() or "ohno"
+
+        if random.random() < 0.1:
+            return Enemy2(self.game, new_word, y)
+        else:
+            return Enemy1(self.game, new_word, y)
+        
 
     def update(self):
         dt = self.game.clock.get_time() / 1000
         self.enemies.update(dt)
         self.text_box.update(dt)
 
-        for enemy in self.enemies:
+        for enemy in list(self.enemies):
             if enemy.passed:
                 self.hp -= 1
 
-                new_word = self.word_api.get_word() or "ohno"
-                enemy.reset(new_word, enemy.rect.centery)
+                y = enemy.rect.centery
+                enemy.kill()
+                new_enemy = self.spawn_enemy(y)
+                self.enemies.add(new_enemy)
 
                 enemy.passed = False
 
