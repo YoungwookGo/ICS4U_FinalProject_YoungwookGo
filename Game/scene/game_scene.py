@@ -106,7 +106,6 @@ class GameScene(Scene):
             # Text enter
             result = self.text_box.interact(event)
             if result == "enter":
-                print("Typed:", self.text_box.text)
                 self.check_input()
 
     # ====================================================================
