@@ -71,9 +71,9 @@ class GameScene(Scene):
         # Entities ------------------------------
         self.enemies = pygame.sprite.Group()
         for i in range(3):
-            word = self.word_api.get_word() or "ohno"
             y = 200 + i * 120
-            enemy = Enemy1(self.game, y, word)
+            word = self.word_api.get_word() or "ohno"
+            enemy = Enemy1(self.game, y, word=word)
             self.enemies.add(enemy)
 
         # Game variables ------------------------
@@ -184,13 +184,15 @@ class GameScene(Scene):
 
 
     def spawn_enemy(self, y):
+        speed_adj = (self.stage - 1) * 10
+
         r = random.random()
         if r < 0.10:
-            return Enemy3(self.game, y)
+            return Enemy3(self.game, y, speed_adj=speed_adj)
         elif r < 0.20:
-            return Enemy2(self.game, y)
+            return Enemy2(self.game, y, speed_adj=speed_adj)
         else:
-            return Enemy1(self.game, y)
+            return Enemy1(self.game, y, speed_adj=speed_adj)
         
     # ====================================================================
 

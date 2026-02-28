@@ -10,8 +10,10 @@ class Enemy3(Enemy):
     BASE_COLOR = (225, 0, 15)
     BASE_HP = 2
 
-    def __init__(self, game, y, word = None):
-        super().__init__(game, y, word)
+    DAMAGED_SPEED_MULTIPLIER = 0.75
+
+    def __init__(self, game, y, speed_adj = 0, word = None):
+        super().__init__(game, y, speed_adj=speed_adj, word=word)
 
     def take_damage(self):
         """
@@ -23,7 +25,9 @@ class Enemy3(Enemy):
         if self.hp > 0:
             self.new_word()
             self.text_color = (239, 65, 53)
-            self.speed = self.calculate_speed()
+
+            self.speed = (self.calculate_speed() + self.speed_adj) * self.DAMAGED_SPEED_MULTIPLIER
+
             self._rerender()
 
             return False
