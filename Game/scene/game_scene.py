@@ -121,9 +121,9 @@ class GameScene(Scene):
         # Check each enemy with user input
         for enemy in self.enemies:
             if enemy.word == text_input:
-                died = enemy.take_damage()
+                die = enemy.take_damage()
 
-                if died:
+                if die:
                     # Common events on enemy defeat
                     self.defeat_enemy(enemy)
 
@@ -149,8 +149,12 @@ class GameScene(Scene):
         self.energy -= 100
 
         for enemy in self.enemies:
-            self.defeat_enemy(enemy)
+            die = enemy.take_damage()
 
+            if die:
+                # Common events on enemy defeat
+                self.defeat_enemy(enemy)
+            
     # ====================================================================
 
     def defeat_enemy(self, enemy):
@@ -180,16 +184,15 @@ class GameScene(Scene):
 
 
     def spawn_enemy(self, y):
-        new_word = self.word_api.get_word() or "ohno"
-
         r = random.random()
         if r < 0.10:
-            return Enemy3(self.game, y, new_word)
+            return Enemy3(self.game, y)
         elif r < 0.20:
-            return Enemy2(self.game, y, new_word)
+            return Enemy2(self.game, y)
         else:
-            return Enemy1(self.game, y, new_word)
+            return Enemy1(self.game, y)
         
+    # ====================================================================
 
     def update(self):
         dt = self.game.clock.get_time() / 1000

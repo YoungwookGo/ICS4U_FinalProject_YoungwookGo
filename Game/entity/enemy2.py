@@ -10,7 +10,7 @@ class Enemy2(Enemy):
     BASE_COLOR = (0, 255, 200)
     BASE_SPEED = 300
 
-    def __init__(self, game, y, word: None):
+    def __init__(self, game, y, word = None):
         super().__init__(game, y, word)
 
         self.text_color = self.BASE_COLOR

@@ -11,7 +11,7 @@ class Enemy(pygame.sprite.Sprite):
     BASE_SPEED = 120
     BASE_HP = 1
 
-    def __init__(self, game, y, word: None):
+    def __init__(self, game, y, word = None):
         # Call initialize method from parent class
         super().__init__()
         
@@ -24,10 +24,12 @@ class Enemy(pygame.sprite.Sprite):
         self.passed = False
         
         if word is None:
-            self.generate_word()
+            self.new_word()
+            self.speed = self.calculate_speed()
+            self._rerender()
         else:
             self.word = word
-            self.speed = self.calculate_speed(self.word)
+            self.speed = self.calculate_speed()
             self._rerender()
 
         start_x = -20
@@ -36,12 +38,8 @@ class Enemy(pygame.sprite.Sprite):
 
     # Word ===============================================================
 
-    def generate_word(self):
-        new_word = self.game.scene.word_api.get_word() or "ohno"
-
-        self.word = new_word
-        self.speed = self.calculate_speed(self.word)
-        self._rerender()
+    def new_word(self):
+        self.word = self.game.scene.word_api.get_word() or "ohno"
 
     # Combat =============================================================
     
@@ -52,7 +50,7 @@ class Enemy(pygame.sprite.Sprite):
         """
         self.hp -= 1
         if self.hp > 0:
-            self.on_damaged()
+            self.damage_effect()
             return False
         return True
     
@@ -69,13 +67,13 @@ class Enemy(pygame.sprite.Sprite):
 
     # Movement ===========================================================
 
-    def calculate_speed(self, word: str | None = None) -> float:
+    def calculate_speed(self) -> float:
         """Calculate enemy speed"""
         base_len = 6
         min_speed = 30
         max_speed = 200
 
-        L = max(1, len(word))
+        L = max(1, len(self.word))
         speed = self.BASE_SPEED * (base_len / L)
 
         # clamp

@@ -10,7 +10,7 @@ class Enemy3(Enemy):
     BASE_COLOR = (225, 0, 15)
     BASE_HP = 2
 
-    def __init__(self, game, y, word: None):
+    def __init__(self, game, y, word = None):
         super().__init__(game, y, word)
 
     def take_damage(self):
@@ -21,8 +21,9 @@ class Enemy3(Enemy):
         self.hp -= 1
 
         if self.hp > 0:
-            self.generate_word()
+            self.new_word()
             self.text_color = (239, 65, 53)
+            self.speed = self.calculate_speed()
             self._rerender()
 
             return False
