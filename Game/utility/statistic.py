@@ -52,6 +52,8 @@ class StatsManager:
         if folder:
             os.makedirs(folder, exist_ok=True)
 
+    # ====================================================================
+
     # Get stats & achieves ----------------------
     def get_stat(self, key: str) -> int:
         return int(self.data["stats"].get(key, 0))

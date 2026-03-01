@@ -17,10 +17,11 @@ class OverScene(Scene):
         self.button_font = pygame.font.Font("Game/asset/font/NotoSans-SemiBold.ttf", 40)
 
         # Create title and button
-        self.title_surface = self.title_font.render(
-            f"New High Score!: {self.game.last_score}", True, (255, 255, 255)
-        )
-        self.title_surface = self.title_font.render("Game Over!", True, (255, 255, 255))
+        if self.game.is_high_score:
+            title_text = "New High Score!" 
+        else:
+            title_text = "Game Over!"
+        self.title_surface = self.title_font.render(title_text, True, (255, 255, 255))
 
         self.high_score_surface = self.score_font.render(
             f"High Score: {self.game.high_score}", True, (255, 255, 255)
@@ -93,5 +94,5 @@ class OverScene(Scene):
         self.menu_button.locate(center_x + 120, center_y + 110)
         self.menu_button.draw(screen)
 
-        self.stat_button.locate(center_x, center_y + 200)
-        self.stat_button.draw(screen)
+        # self.stat_button.locate(center_x, center_y + 200)
+        # self.stat_button.draw(screen)
