@@ -28,6 +28,21 @@ class GameScene(Scene):
             os.path.join("Game", "asset", "font", "NotoSans-Medium.ttf"), 48)
         self.ui_font = pygame.font.Font(
             os.path.join("Game","asset","font","NotoSans-SemiBold.ttf"), 32)
+        
+        # Game variables ------------------------
+        self.init_hp = 5
+        self.hp = self.init_hp
+
+        self.score = 0
+        self.combo = 0
+
+        self.stage = 14
+
+        self.energy = 0
+
+        # Statistic variables -------------------
+        self.max_combo = 0
+        self.kill_count = 0
 
         # Background ----------------------------
         self.bg_files = [
@@ -57,7 +72,8 @@ class GameScene(Scene):
             img = pygame.transform.scale(img, (self.game.WIDTH, self.game.HEIGHT))
             self.bg_images.append(img)
 
-        self.background = self.bg_images[0]
+        bg_idx = (self.stage - 1) % len(self.bg_images)
+        self.background = self.bg_images[bg_idx]
 
         # UI ------------------------------------
         self.text_box = TextBox(
@@ -75,21 +91,6 @@ class GameScene(Scene):
             word = self.word_api.get_word() or "ohno"
             enemy = Enemy1(self.game, y, word=word)
             self.enemies.add(enemy)
-
-        # Game variables ------------------------
-        self.init_hp = 5
-        self.hp = self.init_hp
-
-        self.score = 0
-        self.combo = 0
-
-        self.stage = 1
-
-        self.energy = 0
-
-        # Statistic variables -------------------
-        self.max_combo = 0
-        self.kill_count = 0
 
     def manage_event(self, events):
         # Call manage_event method from parent class
@@ -214,7 +215,7 @@ class GameScene(Scene):
 
             if self.hp <= 0:
                 # Game over
-                self.request_scene = "menu"
+                self.request_scene = "over"
                 # Statistics renewal
                 self.stats.increment_total_games()
                 new_record = self.stats.submit_score(self.score)

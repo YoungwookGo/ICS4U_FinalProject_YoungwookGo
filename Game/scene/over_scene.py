@@ -2,10 +2,10 @@ import pygame
 from scene.base_scene import Scene
 from utility.button import Button
 
-class MenuScene(Scene):
+class OverScene(Scene):
     """
-    Main Menu scene.
-    Displays title and button.
+    Gave Over scene.
+    Displays statistics and button.
     """
 
     def __init__(self, game):
@@ -16,8 +16,8 @@ class MenuScene(Scene):
         self.button_font = pygame.font.Font("Game/asset/font/NotoSans-SemiBold.ttf", 40)
 
         # Create title and button
-        self.title_surface = self.title_font.render("Typing Game", True, (255, 255, 255))
-        
+        self.title_surface = self.title_font.render("Game Over!", True, (255, 255, 255))
+
         self.start_button = Button(
             font=self.button_font,
             text="START",
@@ -27,15 +27,23 @@ class MenuScene(Scene):
             active_color=(255, 255, 255),
         )
 
-        self.quit_button = Button(
+        self.menu_button = Button(
             font=self.button_font,
-            text="QUIT",
+            text="MENU",
             size=(220, 70),
-            text_color=(255, 255, 255),
-            idle_color=(170, 50, 50),
-            active_color=(220, 70, 70),
+            text_color=(0, 0, 0),
+            idle_color=(200, 200, 200),
+            active_color=(255, 255, 255),
         )
 
+        self.stat_button = Button(
+            font=self.button_font,
+            text="STAT",
+            size=(220, 70),
+            text_color=(0, 0, 0),
+            idle_color=(200, 200, 200),
+            active_color=(255, 255, 255),
+        )
 
     def manage_event(self, events):
         super().manage_event(events)
@@ -44,8 +52,8 @@ class MenuScene(Scene):
             if self.start_button.interact(event):
                 self.request_scene = "game"
 
-            if self.quit_button.interact(event):
-                self.request_quit = True
+            if self.menu_button.interact(event):
+                self.request_scene = "menu"
 
     def update(self):
         pass
@@ -63,8 +71,11 @@ class MenuScene(Scene):
         screen.blit(self.title_surface, title_rect)
 
         # ----- Button -----
-        self.start_button.locate(center_x, center_y + 20)
+        self.start_button.locate(center_x - 120, center_y + 20)
         self.start_button.draw(screen)
 
-        self.quit_button.locate(center_x, center_y + 110)
-        self.quit_button.draw(screen)
+        self.menu_button.locate(center_x + 120, center_y + 20)
+        self.menu_button.draw(screen)
+
+        self.stat_button.locate(center_x, center_y + 110)
+        self.stat_button.draw(screen)

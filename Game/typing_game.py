@@ -16,6 +16,7 @@ import pygame
 # Import scene
 from scene.menu_scene import MenuScene
 from scene.game_scene import GameScene
+from scene.over_scene import OverScene
 
 class Game:
     """
@@ -79,6 +80,8 @@ class Game:
             self.scene = MenuScene(self)
         elif scene_key == "game":
             self.scene = GameScene(self)
+        elif scene_key == "over":
+            self.scene = OverScene(self)
         else:
             print("Invalid scene request: ", scene_key)
 
