@@ -25,11 +25,21 @@ class StatsManager:
             with open(self.filepath, "r", encoding="utf-8") as f:
                 loaded = json.load(f)
                 if isinstance(loaded, dict):
-                    # 필요한 키만 안전하게 병합
-                    self.data.update(loaded)
+                    stats = loaded.get("stats", {})
+                    achievements = loaded.get("achievements", {})
+                    if isinstance(stats, dict):
+                        self.data["stats"].update(stats)
+                    if isinstance(achievements, dict):
+                        self.data["achievements"].update(achievements)
         except (json.JSONDecodeError, OSError):
-            # 파일이 깨졌으면 기본값으로 재생성
-            self.data = {"high_score": 0}
+            self.data = {
+                "stats": {
+                    "total_games": 0,
+                },
+                "achievements": {
+                    "high_score": 0,
+                }
+            }
             self.save()
 
     def save(self):

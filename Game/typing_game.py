@@ -41,6 +41,11 @@ class Game:
         pygame.display.set_caption("Typing Game")
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
 
+        # Initialize stats
+        self.last_score = 0
+        self.high_score = 0
+        self.is_high_score = False
+
         # Initialize game scene
         self.scene = MenuScene(self)
 

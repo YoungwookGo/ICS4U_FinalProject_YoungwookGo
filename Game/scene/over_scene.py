@@ -13,10 +13,21 @@ class OverScene(Scene):
 
         # Fonts
         self.title_font = pygame.font.Font("Game/asset/font/NotoSans-SemiBold.ttf", 80)
+        self.score_font = pygame.font.Font("Game/asset/font/NotoSans-SemiBold.ttf", 36)
         self.button_font = pygame.font.Font("Game/asset/font/NotoSans-SemiBold.ttf", 40)
 
         # Create title and button
+        self.title_surface = self.title_font.render(
+            f"New High Score!: {self.game.last_score}", True, (255, 255, 255)
+        )
         self.title_surface = self.title_font.render("Game Over!", True, (255, 255, 255))
+
+        self.high_score_surface = self.score_font.render(
+            f"High Score: {self.game.high_score}", True, (255, 255, 255)
+        )
+        self.score_surface = self.score_font.render(
+            f"Score: {self.game.last_score}", True, (255, 255, 255)
+        )
 
         self.start_button = Button(
             font=self.button_font,
@@ -70,12 +81,17 @@ class OverScene(Scene):
         title_rect = self.title_surface.get_rect(center=(center_x, center_y - 100))
         screen.blit(self.title_surface, title_rect)
 
+        score_rect = self.score_surface.get_rect(center=(center_x, center_y - 20))
+        high_score_rect = self.high_score_surface.get_rect(center=(center_x, center_y + 25))
+        screen.blit(self.score_surface, score_rect)
+        screen.blit(self.high_score_surface, high_score_rect)
+
         # ----- Button -----
-        self.start_button.locate(center_x - 120, center_y + 20)
+        self.start_button.locate(center_x - 120, center_y + 110)
         self.start_button.draw(screen)
 
-        self.menu_button.locate(center_x + 120, center_y + 20)
+        self.menu_button.locate(center_x + 120, center_y + 110)
         self.menu_button.draw(screen)
 
-        self.stat_button.locate(center_x, center_y + 110)
+        self.stat_button.locate(center_x, center_y + 200)
         self.stat_button.draw(screen)

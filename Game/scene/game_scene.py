@@ -40,7 +40,7 @@ class GameScene(Scene):
 
         self.energy = 0
 
-        # Statistic variables -------------------
+        # Stat variables ------------------------
         self.max_combo = 0
         self.kill_count = 0
 
@@ -91,6 +91,8 @@ class GameScene(Scene):
             word = self.word_api.get_word() or "ohno"
             enemy = Enemy1(self.game, y, word=word)
             self.enemies.add(enemy)
+
+    # ====================================================================
 
     def manage_event(self, events):
         # Call manage_event method from parent class
@@ -215,10 +217,14 @@ class GameScene(Scene):
 
             if self.hp <= 0:
                 # Game over
+                self.game.last_score = self.score
                 self.request_scene = "over"
                 # Statistics renewal
                 self.stats.increment_total_games()
-                new_record = self.stats.submit_score(self.score)
+                self.game.is_high_score = self.stats.submit_score(self.score)
+                print(self.game.is_high_score)
+                self.game.high_score = self.stats.get_achievement("high_score")
+                print(self.game.high_score)
                 return
 
     def draw(self, screen):
