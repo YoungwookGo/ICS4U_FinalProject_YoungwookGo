@@ -4,23 +4,23 @@
 # Author:       Youngwook Go 
 # Date:         2026-03-01
 # File Name:    random_word.py 
-# Description:  
-#   This class fetches random English words from an online API,
-#              stores them in a buffer, 
-#              and returns the next word in order.
 ##############################################
 import requests
 
 class RandomWord:
     """
-    This class retrieves random words from an external API, stores them in an internal buffer to reduce repeated API calls, and returns them one by one.
+    This class provides random words to use in the game. 
+    To do so:
+    - Retrieves set of random words from an external API.
+    - Stores them in an internal buffer.
+    - Provides words sequentially.
     """
     # Constant URL for the external random word API.
     __API_URL = "https://random-word-api.herokuapp.com/word"
 
     def __init__(self, prefetch=50, refill_at=10, timeout=5):
         """
-        Initialize the RandomWord object.
+        Initialize a new RandomWord instance.
         """
         # Validate prefetch value.
         if not isinstance(prefetch, int) or prefetch <= 0:
