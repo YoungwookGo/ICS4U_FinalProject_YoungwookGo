@@ -4,18 +4,21 @@
 # Author:       Youngwook Go 
 # Date:         2026-03-01
 # File Name:    statistic.py 
+# Description:  
+#   This class stores and manages game statistics using a JSON file.
+#    - Save important game data (ex: total games, high score) so it persists after closing the game.
+#    - Keep the program stable even if the file is missing or corrupted.
+#    - Provide simple methods to read and update stats/achievements.
 ##############################################
 import json
 import os
 
 class StatsManager:
     """
-    This class stores and manages game statistics to use in the game.
-    To do so:
-      - Call and read a JSON file.
-      - Save important game data so it persists after closing the game.
-      - Keep the program stable even if the file is missing or corrupted.
-      - Provide simple methods to read and update stats/achievements.
+    To store and manage game statistics:
+    1. At startup, the manager loads data from a JSON file.
+    2. If the file does not exist, it creates a new file with default values.
+    3. If the file is corrupted, it resets to defaults and saves a clean file.
     """
     def __init__(self, filepath="Game/game_stats.json"):
         """

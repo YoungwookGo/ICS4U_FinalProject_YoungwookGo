@@ -1,19 +1,25 @@
 # #####################################
 # Class Name:   TextBox
-# Course:       ICS4U
-# Author:       Youngwook Go
+# Course:       ICS4U 
+# Author:       Youngwook Go 
 # Date:         2026-03-01
-# File Name:    text_box.py
+# File Name:    text_box.py 
+# Description:  
+#   This class handles text input actions.
+#    - Create an input box that can be reused across scenes (Menu, Game, Over).
+#    - Support mouse activation, keyboard typing, backspace deletion, and Enter submission.
+#    - Display a blinking cursor to notice typing area.
 ##############################################
+
+# Pygame is a Python library for building 2D games and multimedia applications.
 import pygame
 
 class TextBox:
     """
-    This class receives and manages keyboard input typed by the user.
-    To do so:
-      - Create an input box that can be reused across scenes.
-      - Support mouse activation, keyboard typing, backspace deletion, and Enter submission.
-      - Display a blinking cursor to notice typing area.
+    TextBox is a reusable UI component for typing input.
+    - Click to activate
+    - Type to input
+    - Backspace to delete
     """
 
     # Default UI constants

@@ -1,106 +1,192 @@
+# #####################################
+# Class Name:   GameScene
+# Course:       ICS4U 
+# Author:       Youngwook Go 
+# Date:         2026-03-02
+# File Name:    game_scene.py
+# Description:  
+#   GameScene is the main gameplay scene for the typing game.
+#    - Spawn and update moving word enemies using a Sprite Group.
+#    - Collect typing input through a TextBox and check against enemies.
+#    - Track gameplay stats (score, combo, kills, stage, energy, duration).
+#    - Save statistics and high score when the game ends.
+# #####################################
 import pygame
 import os
 import random
+
 from scene.base_scene import Scene
 from utility.text_box import TextBox
 from utility.random_word import RandomWord
 from utility.statistic import StatsManager
-from entity.enemy1 import Enemy1
-from entity.enemy2 import Enemy2
-from entity.enemy3 import Enemy3
-
+from entity.enemy import Enemy1, Enemy2, Enemy3
 
 class GameScene(Scene):
     """
     Main game scene class for the program.
     """
+    # File paths
+    FONT_INPUT_PATH = os.path.join("Game", "asset", "font", "NotoSans-Medium.ttf")
+    FONT_UI_PATH = os.path.join("Game", "asset", "font", "NotoSans-SemiBold.ttf")
+    WALLPAPER_DIR = os.path.join("Game", "asset", "wallpaper")
+
+    # UI settings
+    INPUT_FONT_SIZE = 48
+    UI_FONT_SIZE = 32
+    INPUT_BOX_SIZE = (1000, 80)
+
+    INPUT_TEXT_COLOR = (255, 255, 255)  # White
+    INPUT_IDLE_COLOR = (70, 70, 80)
+    INPUT_ACTIVE_COLOR = (110, 110, 130)
+
+    # Gameplay tuning
+    INIT_DURABILITY = 5
+    ENERGY_PER_KILL = 10
+    SKILL1_COST = 100
+
+    BASE_SCORE = 10
+    SCORE_STAGE_BONUS = 1  # added as (stage - 1) * SCORE_STAGE_BONUS
+    SCORE_COMBO_BONUS = 1  # added as combo * SCORE_COMBO_BONUS
+
+    START_ENEMY_COUNT = 3
+    ENEMY_START_Y = 200
+    ENEMY_Y_GAP = 120
+
+    # Stage logic
+    KILLS_PER_STAGE = 20
+    SPEED_ADJ_PER_STAGE = 10
+
+    # Enemy spawn probabilities
+    # 10% Enemy3, next 10% Enemy2, otherwise Enemy1
+    ENEMY3_RATE = 0.10
+    ENEMY2_RATE = 0.20
+
+    # Background filename list
+    BG_FILES = [
+        "Solar_gradients_01.jpg",
+        "Solar_gradients_02.jpg",
+        "Solar_gradients_03.jpg",
+        "Solar_gradients_04.jpg",
+        "Solar_gradients_05.jpg",
+        "Solar_gradients_06.jpg",
+        "Solar_gradients_07.jpg",
+        "Solar_gradients_08.jpg",
+        "Solar_gradients_09.jpg",
+        "Solar_gradients_10.jpg",
+        "Solar_gradients_11.jpg",
+        "Solar_gradients_12.jpg",
+        "Solar_gradients_13.jpg",
+        "Solar_gradients_14.jpg",
+        "Solar_gradients_15.jpg",
+        "Solar_gradients_16.jpg",
+    ]
 
     def __init__(self, game):
+        """
+        Initialize the gameplay scene.
+        """
         # Call initialize method from parent class
         super().__init__(game)
 
-        # Call utility --------------------------
+        # Call utility
         self.word_api = RandomWord()
         self.stats = StatsManager()
 
-        # Font ----------------------------------
-        self.input_font = pygame.font.Font(
-            os.path.join("Game", "asset", "font", "NotoSans-Medium.ttf"), 48)
-        self.ui_font = pygame.font.Font(
-            os.path.join("Game","asset","font","NotoSans-SemiBold.ttf"), 32)
+        # Fonts
+        self.input_font = pygame.font.Font(self.FONT_INPUT_PATH, self.INPUT_FONT_SIZE)
+        self.ui_font = pygame.font.Font(self.FONT_UI_PATH, self.UI_FONT_SIZE)
         
-        # Game variables ------------------------
-        self.init_hp = 5
-        self.hp = self.init_hp
+        # Core gameplay state
+        self.init_durability = self.INIT_DURABILITY
+        self.durability = self.init_durability
 
         self.score = 0
         self.combo = 0
-
         self.stage = 1
-
         self.energy = 0
 
-        # Stat variables ------------------------
+        # Stat variables 
         self.max_combo = 0
         self.kill_count = 0
 
-        # Background ----------------------------
-        self.bg_files = [
-            "Solar_gradients_01.jpg",
-            "Solar_gradients_02.jpg",
-            "Solar_gradients_03.jpg",
-            "Solar_gradients_04.jpg",
-            "Solar_gradients_05.jpg",
-            "Solar_gradients_06.jpg",
-            "Solar_gradients_07.jpg",
-            "Solar_gradients_08.jpg",
-            "Solar_gradients_09.jpg",
-            "Solar_gradients_10.jpg",
-            "Solar_gradients_11.jpg",
-            "Solar_gradients_12.jpg",
-            "Solar_gradients_13.jpg",
-            "Solar_gradients_14.jpg",
-            "Solar_gradients_15.jpg",
-            "Solar_gradients_16.jpg",
-        ]
+        # Background images
+        self.bg_images = self.load_backgrounds()
+        self.background = self.bg_images[0] if self.bg_images else None
 
-        self.bg_images = []
-
-        for filename in self.bg_files:
-            path = os.path.join("Game", "asset", "wallpaper", filename)
-            img = pygame.image.load(path).convert()
-            img = pygame.transform.scale(img, (self.game.WIDTH, self.game.HEIGHT))
-            self.bg_images.append(img)
-
-        bg_idx = (self.stage - 1) % len(self.bg_images)
-        self.background = self.bg_images[bg_idx]
-
-        # UI ------------------------------------
+        # Text input UI
         self.text_box = TextBox(
             font=self.input_font,
-            size=(1000, 80),
-            text_color=(255, 255, 255),
-            idle_color=(70, 70, 80),
-            active_color=(110, 110, 130),
+            size=self.INPUT_BOX_SIZE,
+            text_color=self.INPUT_TEXT_COLOR,
+            idle_color=self.INPUT_IDLE_COLOR,
+            active_color=self.INPUT_ACTIVE_COLOR,
         )
 
-        # Entities ------------------------------
+        # Place the input box once
+        center_x = self.game.WIDTH // 2
+        self.text_box.locate(center_x, self.game.HEIGHT - 80)
+
+        # Enemy group
         self.enemies = pygame.sprite.Group()
-        for i in range(3):
-            y = 200 + i * 120
+        self.spawn_start_enemies()
+
+        # Update background image
+        self.update_background()
+    #end __init__()
+
+    def load_backgrounds(self):
+        """
+        Load and scale background images.
+        """
+        images = []
+        for filename in self.BG_FILES: # Background image file lists
+            path = os.path.join(self.WALLPAPER_DIR, filename)
+            try:
+                img = pygame.image.load(path).convert()
+                img = pygame.transform.scale(img, (self.game.WIDTH, self.game.HEIGHT))
+                images.append(img)
+            except (pygame.error, OSError):
+                # If one image fails, skip it but keep the game running.
+                print(f"GameScene ERROR: Failed to load background -> {path}")
+
+        # Return list of loaded image.
+        return images
+    #end load_backgrounds()
+    
+    def spawn_start_enemies(self):
+        """
+        Spawn the initial enemies at fixed lane positions.
+        """
+        for i in range(self.START_ENEMY_COUNT):
+            y = self.ENEMY_START_Y + i * self.ENEMY_Y_GAP
             word = self.word_api.get_word() or "ohno"
             enemy = Enemy1(self.game, y, word=word)
             self.enemies.add(enemy)
+    #end spawn_start_enemies()
 
-    # ====================================================================
+    def update_background(self):
+        """
+        Update the background based on the current stage.
+        """
+        if not self.bg_images:
+            self.background = None
+            return
+
+        index = (self.stage - 1) % len(self.bg_images)
+        self.background = self.bg_images[index]
+    #end update_background()
 
     def manage_event(self, events):
+        """
+        Handle input events in text_box class.
+        - TAB: Activate Skill 1
+        - Enter: Submit typed word
+        """
         # Call manage_event method from parent class
         super().manage_event(events)
 
         # Manage every events from referenced classes
         for event in events:
-            # Manage events in text_box class -----------------------
             # Skill 1
             if event.type == pygame.KEYDOWN and event.key == pygame.K_TAB:
                 self.skill1()
@@ -110,12 +196,14 @@ class GameScene(Scene):
             result = self.text_box.interact(event)
             if result == "enter":
                 self.check_input()
-
-    # ====================================================================
+    #end manage_event()
 
     def check_input(self):
+        """
+        Check the player's typed word against current enemies.
+        """
         # Case sensitive
-        text_input = self.text_box.text.strip()
+        text_input = self.text_box.get_text().strip()
 
         # Do nothing when text input is empty
         if text_input == "":
@@ -142,52 +230,63 @@ class GameScene(Scene):
             # When there is no word matching with input
             self.combo = 0
 
-        self.text_box.text = ""
+        self.text_box.clear()
+    #end check_input()
 
     def skill1(self):
-        """Remove all enemies on screen and respawn them with new words."""
-        if self.energy < 100:
+        """
+        Remove all enemies on screen and respawn them with new words.
+        """
+        if self.energy < self.SKILL1_COST:
             return  # not ready
     
-        self.energy -= 100
+        self.energy -= self.SKILL1_COST
 
-        for enemy in self.enemies:
+        # Iterate on a copy because enemies will be removed and replaced
+        for enemy in list(self.enemies):
             die = enemy.take_damage()
 
             if die:
                 # Common events on enemy defeat
                 self.defeat_enemy(enemy)
-            
-    # ====================================================================
+    #end skill1()
 
     def defeat_enemy(self, enemy):
-        """Manage events when an enemy is defeated."""
+        """
+        Manage events when an enemy is defeated.
+        """
 
-        # Manage score
-        gained = 10 + self.combo + (self.stage - 1) 
+        # Score formula (easy to explain in report)
+        gained = (
+            self.BASE_SCORE
+            + self.combo * self.SCORE_COMBO_BONUS
+            + (self.stage - 1) * self.SCORE_STAGE_BONUS
+        )
         self.score += gained
 
         # Manage statistics
         self.kill_count += 1
 
-        # Manage background
-        if self.kill_count >= self.stage * 20:
-            self.stage = self.kill_count // 20 + 1
-            bg_idx = (self.stage - 1) % len(self.bg_images)
-            self.background = self.bg_images[bg_idx]
+        # Stage update is based on kill count
+        self.stage = (self.kill_count // self.KILLS_PER_STAGE) + 1
+        self.update_background()
 
         # Manage loot and exit effect
         enemy.exit_effect(self)
 
         # Reset enemy
-        y = enemy.rect.centery
+        lane_y = enemy.rect.centery
         enemy.kill()
-        new_enemy = self.spawn_enemy(y)
-        self.enemies.add(new_enemy)
 
+        new_enemy = self.spawn_enemy(lane_y)
+        self.enemies.add(new_enemy)
+    #end defeat_enemy()
 
     def spawn_enemy(self, y):
-        speed_adj = (self.stage - 1) * 10
+        """
+        Spawn an enemy based on current stage and spawn probabilities.
+        """
+        speed_adj = (self.stage - 1) * self.SPEED_ADJ_PER_STAGE
 
         r = random.random()
         if r < 0.10:
@@ -196,64 +295,81 @@ class GameScene(Scene):
             return Enemy2(self.game, y, speed_adj=speed_adj)
         else:
             return Enemy1(self.game, y, speed_adj=speed_adj)
-        
-    # ====================================================================
+    #end spawn_enemy()
 
     def update(self):
+        """
+        Update enemies, input UI, and handle game-over conditions.
+        """
         dt = self.game.clock.get_time() / 1000
+
+        # Update entities
         self.enemies.update(dt)
         self.text_box.update(dt)
 
+        # Handle enemies that passed the screen edge
         for enemy in list(self.enemies):
             if enemy.passed:
-                self.hp -= 1
+                self.durability -= 1
 
                 y = enemy.rect.centery
                 enemy.kill()
+
                 new_enemy = self.spawn_enemy(y)
                 self.enemies.add(new_enemy)
 
                 enemy.passed = False
 
-            if self.hp <= 0:
-                # Game over
-                self.game.last_score = self.score
-                self.request_scene = "over"
-                # Statistics renewal
-                self.stats.increment_total_games()
-                self.game.is_high_score = self.stats.submit_score(self.score)
-                print(self.game.is_high_score)
-                self.game.high_score = self.stats.get_achievement("high_score")
-                print(self.game.high_score)
-                return
+                # Reset combo when the player misses an enemy
+                self.combo = 0
+
+            # Game over check (after processing all passed enemies)
+            if self.durability <= 0:
+                self.game_over()
+    #end update()
+
+    def game_over(self):
+        """
+        Save statistics and request transition to OverScene.
+        """
+        self.game.last_score = self.score
+
+        # Statistics saving
+        self.stats.increment_total_games()
+        self.game.is_high_score = self.stats.submit_score(self.score)
+        print("Is High Score: ", self.game.is_high_score)
+
+        # Sync high score value from StatsManager
+        self.game.high_score = self.stats.get_achievement("high_score")
+        print("High Score: ", self.game.high_score)
+
+        # Request scene transition
+        self.request_scene = self.OVER_SCENE
+    #end game_over()
 
     def draw(self, screen):
+        """
+        Draw background, enemies, input box, and UI HUD.
+        """
         # Draw background image
         screen.blit(self.background, (0, 0))
 
-        # Define center guideline
-        center_x = self.game.WIDTH // 2
-        center_y = self.game.HEIGHT // 2
-
         # Text box
-        self.text_box.locate(center_x, self.game.HEIGHT - 80)
         self.text_box.draw(screen)
 
         # Enemy
         self.enemies.draw(screen)
 
         # UI
-        hp_surf = self.ui_font.render(f"HP: {self.hp}/{self.init_hp}", True, (255, 255, 255))
-        score_surf = self.ui_font.render(f"Score: {self.score}", True, (255, 255, 255))
-        combo_surf = self.ui_font.render(f"Combo: {self.combo}", True, (255, 255, 255))
-        energy_surf = self.ui_font.render(f"Energy: {self.energy}", True, (255, 255, 255))
+        durability_surf = self.ui_font.render(f"Durability: {self.durability}/{self.init_durability}", True, self.INPUT_TEXT_COLOR)
+        score_surf = self.ui_font.render(f"Score: {self.score}", True, self.INPUT_TEXT_COLOR)
+        combo_surf = self.ui_font.render(f"Combo: {self.combo}", True, self.INPUT_TEXT_COLOR)
+        energy_surf = self.ui_font.render(f"Energy: {self.energy}", True, self.INPUT_TEXT_COLOR)
+        kill_surf = self.ui_font.render(f"Kill: {self.kill_count}", True, self.INPUT_TEXT_COLOR)
 
-        kill_surf = self.ui_font.render(f"Kill: {self.kill_count}", True, (255, 255, 255))
-
-
-        screen.blit(hp_surf, (20, 10))
+        screen.blit(durability_surf, (20, 10))
         screen.blit(score_surf, (200, 10))
         screen.blit(combo_surf, (400, 10))
         screen.blit(energy_surf, (600, 10))
-
         screen.blit(kill_surf, (20, 45))
+    #end draw()
