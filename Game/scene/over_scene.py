@@ -48,7 +48,7 @@ class OverScene(Scene):
             f"Score: {self.game.last_score}", True, self.TEXT_COLOR_LIGHT
         )
 
-        # Buttons
+        # Initialize buttons
         self.start_button = Button(
             font=self.button_font,
             text="START",

@@ -36,26 +36,25 @@ class MenuScene(Scene):
         # Create title and button
         self.title_surface = self.title_font.render(self.TITLE_TEXT, True, self.TEXT_COLOR_LIGHT)
 
-        # Create buttons
+        # Initialize buttons
         self.start_button = Button(
             font=self.button_font,
             text="START",
             size=self.BUTTON_SIZE,
-            text_color=(0, 0, 0),
-            idle_color=(200, 200, 200),
-            active_color=(255, 255, 255),
+            text_color=self.TEXT_COLOR_DARK,
+            idle_color=self.BUTTON_COLOR_IDLE,
+            active_color=self.BUTTON_COLOR_ACTIVE,
         )
 
         self.quit_button = Button(
             font=self.button_font,
             text="QUIT",
             size=self.BUTTON_SIZE,
-            text_color=(255, 255, 255),
-            idle_color=(170, 50, 50),
-            active_color=(220, 70, 70),
+            text_color=self.TEXT_COLOR_LIGHT,
+            idle_color=self.QUIT_BUTTON_COLOR_IDLE,
+            active_color=self.QUIT_BUTTON_COLOR_ACTIVE,
         )
 
-        # Place buttons once
         self.start_button.locate(self.center_x, self.center_y + 20)
         self.quit_button.locate(self.center_x, self.center_y + 110)
     #end __init__()

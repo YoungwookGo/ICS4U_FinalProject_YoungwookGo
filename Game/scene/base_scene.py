@@ -25,6 +25,7 @@ class Scene:
     # Shared file paths
     FONT_PATH_MEDIUM = os.path.join("Game", "asset", "font", "NotoSans-Medium.ttf")
     FONT_PATH_BOLD = os.path.join("Game", "asset", "font", "NotoSans-SemiBold.ttf")
+    FONT_PATH_SYMBOL = os.path.join("Game", "asset", "font", "NotoSansSymbols2-Regular.ttf")
     WALLPAPER_DIR = os.path.join("Game", "asset", "wallpaper")
 
     # Shared visual constants
@@ -41,6 +42,7 @@ class Scene:
 
     TITLE_FONT_SIZE = 80
     TEXT_FONT_SIZE = 32
+    ICON_FONT_SIZE = 48
 
     TEXTBOX_FONT_SIZE = 48
     TEXTBOX_SIZE = (1000, 80)

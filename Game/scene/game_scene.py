@@ -16,9 +16,10 @@ import os
 import random
 
 from scene.base_scene import Scene
-from utility.text_box import TextBox
+from utility.button import Button, IconButton
 from utility.random_word import RandomWord
 from utility.statistic import StatsManager
+from utility.text_box import TextBox
 from entity.enemy import Enemy1, Enemy2, Enemy3
 
 class GameScene(Scene):
@@ -68,6 +69,10 @@ class GameScene(Scene):
         "Solar_gradients_16.jpg",
     ]
 
+    # =========================================================================
+    # Initialize section
+    # =========================================================================
+
     def __init__(self, game):
         """
         Initialize the gameplay scene.
@@ -82,6 +87,8 @@ class GameScene(Scene):
         # Fonts
         self.inputbox_font = pygame.font.Font(self.FONT_PATH_MEDIUM, self.TEXTBOX_FONT_SIZE)
         self.ui_font = pygame.font.Font(self.FONT_PATH_BOLD, self.TEXT_FONT_SIZE)
+        self.button_font = pygame.font.Font(self.FONT_PATH_BOLD, self.BUTTON_FONT_SIZE)
+        self.icon_font = pygame.font.Font(self.FONT_PATH_SYMBOL, self.ICON_FONT_SIZE)
         
         # Core gameplay state
         self.init_durability = self.INIT_DURABILITY
@@ -92,13 +99,26 @@ class GameScene(Scene):
         self.stage = 1
         self.energy = 0
 
+        self.paused = False
+
         # Stat variables 
         self.max_combo = 0
         self.kill_count = 0
 
         # Background images
-        self.bg_images = self.load_backgrounds()
+        self.bg_images = self._load_backgrounds()
         self.background = self.bg_images[0] if self.bg_images else None
+
+        # Initialize buttons
+        self.pause_button = IconButton(
+            font=self.icon_font,
+            text="☰",
+            size=(50,50),
+            text_color=self.TEXT_COLOR_DARK,
+            idle_color=self.BUTTON_COLOR_IDLE,
+            active_color=self.BUTTON_COLOR_ACTIVE,
+        )
+        self.pause_button.locate(self.game.WIDTH - 30, 30)
 
         # Text inputbox UI
         self.text_box = TextBox(
@@ -108,20 +128,17 @@ class GameScene(Scene):
             idle_color=self.BUTTON_COLOR_IDLE,
             active_color=self.BUTTON_COLOR_ACTIVE,
         )
-
-        # Place the inputbox once
-        center_x = self.game.WIDTH // 2
-        self.text_box.locate(center_x, self.game.HEIGHT - 80)
+        self.text_box.locate(self.center_x, self.game.HEIGHT - 80)
 
         # Enemy group
         self.enemies = pygame.sprite.Group()
-        self._spawn_start_enemies()
+        self._spawn_init_enemies()
 
         # Update background image
         self.update_background()
     #end __init__()
 
-    def load_backgrounds(self):
+    def _load_backgrounds(self):
         """
         Load and scale background images.
         """
@@ -138,9 +155,9 @@ class GameScene(Scene):
 
         # Return list of loaded image.
         return images
-    #end load_backgrounds()
+    #end _load_backgrounds()
     
-    def _spawn_start_enemies(self):
+    def _spawn_init_enemies(self):
         """
         Spawn the initial enemies at fixed lane positions.
         """
@@ -149,48 +166,27 @@ class GameScene(Scene):
             word = self.word_api.get_word() or "ohno"
             enemy = Enemy1(self.game, y, word=word)
             self.enemies.add(enemy)
-    #end _spawn_start_enemies()
+    #end _spawn_init_enemies()
 
-    def update_background(self):
+    # =========================================================================
+    # END Initialize section
+    # =========================================================================
+
+    def spawn_enemy(self, y):
         """
-        Update the background based on the current stage.
+        Spawn an enemy based on current stage and spawn probabilities.
         """
-        if not self.bg_images:
-            self.background = None
-            return
+        speed_adj = (self.stage - 1) * self.SPEED_ADJ_PER_STAGE
 
-        index = (self.stage - 1) % len(self.bg_images)
-        self.background = self.bg_images[index]
-    #end update_background()
-
-    def manage_event(self, events):
-        """
-        Handle input events in text_box class.
-        - TAB: Activate Skill 1
-        - Enter: Submit typed word
-        """
-        # Call manage_event method from parent class
-        super().manage_event(events)
-
-        # Manage every events from referenced classes
-        for event in events:
-
-            if event.type == pygame.KEYDOWN:
-                # Escape game
-                if event.key == pygame.K_ESCAPE:
-                    self.request_scene = self.OVER_SCENE
-                
-                # Skill 1
-                if event.key == pygame.K_TAB:
-                    self.skill1()
-                    continue
-
-            # Text enter
-            result = self.text_box.interact(event)
-            if result == "enter":
-                self.check_input()
-    #end manage_event()
-
+        r = random.random()
+        if r < 0.10:
+            return Enemy3(self.game, y, speed_adj=speed_adj)
+        elif r < 0.20:
+            return Enemy2(self.game, y, speed_adj=speed_adj)
+        else:
+            return Enemy1(self.game, y, speed_adj=speed_adj)
+    #end spawn_enemy()
+    
     def check_input(self):
         """
         Check the player's typed word against current enemies.
@@ -274,26 +270,92 @@ class GameScene(Scene):
         new_enemy = self.spawn_enemy(lane_y)
         self.enemies.add(new_enemy)
     #end defeat_enemy()
-
-    def spawn_enemy(self, y):
+    
+    def update_background(self):
         """
-        Spawn an enemy based on current stage and spawn probabilities.
+        Update the background based on the current stage.
         """
-        speed_adj = (self.stage - 1) * self.SPEED_ADJ_PER_STAGE
+        if not self.bg_images:
+            self.background = None
+            return
 
-        r = random.random()
-        if r < 0.10:
-            return Enemy3(self.game, y, speed_adj=speed_adj)
-        elif r < 0.20:
-            return Enemy2(self.game, y, speed_adj=speed_adj)
-        else:
-            return Enemy1(self.game, y, speed_adj=speed_adj)
-    #end spawn_enemy()
+        index = (self.stage - 1) % len(self.bg_images)
+        self.background = self.bg_images[index]
+    #end update_background()
+
+    def game_over(self):
+        """
+        Save statistics and request transition to OverScene.
+        """
+        self.game.last_score = self.score
+
+        # Statistics saving
+        self.stats.increment_total_games()
+        self.game.is_high_score = self.stats.submit_score(self.score)
+        print("Is High Score: ", self.game.is_high_score)
+
+        # Sync high score value from StatsManager
+        self.game.high_score = self.stats.get_achievement("high_score")
+        print("High Score: ", self.game.high_score)
+
+        # Request scene transition
+        self.request_scene = self.OVER_SCENE
+    #end game_over()
+
+    def set_paused(self, paused):
+        """
+        Sync paused state with input availability.
+        """
+        self.paused = paused
+        self.text_box.active = not paused
+    #end set_paused()
+
+    def manage_event(self, events):
+        """
+        Handle input events in text_box class.
+        - TAB: Activate Skill 1
+        - Enter: Submit typed word
+        """
+        # Call manage_event method from parent class
+        super().manage_event(events)
+
+        # Manage every events from referenced classes
+        for event in events:
+            # 1) Pause game with button or escape key
+            if self.pause_button.interact(event):
+                self.set_paused(not self.paused)
+                continue
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                self.set_paused(not self.paused)
+                continue
+
+            # 2) If paused: allow only resume input, block others
+            if self.paused == True:
+                if event.type == pygame.KEYDOWN:
+                    self.set_paused(False)
+                continue
+
+            # 3) Normal gameplay inputs
+            if event.type == pygame.KEYDOWN:
+                # Skill 1
+                if event.key == pygame.K_TAB:
+                    self.skill1()
+                    continue
+
+            # 4) Textbox input
+            result = self.text_box.interact(event)
+            if result == "enter":
+                self.check_input()
+    #end manage_event()
 
     def update(self):
         """
         Update enemies, input UI, and handle game-over conditions.
         """
+        if self.paused:
+            return
+    
         dt = self.game.clock.get_time() / 1000
 
         # Update entities
@@ -321,39 +383,23 @@ class GameScene(Scene):
                 self.game_over()
     #end update()
 
-    def game_over(self):
-        """
-        Save statistics and request transition to OverScene.
-        """
-        self.game.last_score = self.score
-
-        # Statistics saving
-        self.stats.increment_total_games()
-        self.game.is_high_score = self.stats.submit_score(self.score)
-        print("Is High Score: ", self.game.is_high_score)
-
-        # Sync high score value from StatsManager
-        self.game.high_score = self.stats.get_achievement("high_score")
-        print("High Score: ", self.game.high_score)
-
-        # Request scene transition
-        self.request_scene = self.OVER_SCENE
-    #end game_over()
-
     def draw(self, screen):
         """
         Draw background, enemies, input box, and UI HUD.
         """
-        # Draw background image
+        # Reset screen
         screen.blit(self.background, (0, 0))
 
-        # Text box
-        self.text_box.draw(screen)
-
-        # Enemy
+        # Draw enemy
         self.enemies.draw(screen)
 
-        # UI
+        # Draw text box
+        self.text_box.draw(screen)
+
+        # Draw button
+        self.pause_button.draw(screen)
+
+        # Draw test
         durability_surf = self.ui_font.render(
             f"Durability: {self.durability}/{self.init_durability}", True, self.TEXT_COLOR_LIGHT)
         

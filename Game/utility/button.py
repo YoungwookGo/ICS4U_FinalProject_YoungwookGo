@@ -21,6 +21,7 @@ class Button:
     """
     # Constant for button box rounded corners
     BORDER_RADIUS = 8
+    TEXT_Y_OFFSET = -2
 
     def __init__(self, font, text, size, text_color, idle_color, active_color):
         """
@@ -78,5 +79,9 @@ class Button:
 
         # Re-center text every draw 
         text_rect = self.text_surface.get_rect(center=self.rect.center)
+        text_rect.centery += self.TEXT_Y_OFFSET
         screen.blit(self.text_surface, text_rect)
     #end draw()
+
+class IconButton(Button):
+    TEXT_Y_OFFSET = 6
