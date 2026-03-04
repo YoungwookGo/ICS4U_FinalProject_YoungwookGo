@@ -10,8 +10,6 @@
 #    - Provide clear navigation buttons (Restart / Menu).
 #    - Keep scene transitions controlled by request flags.
 # #####################################
-import pygame
-import os
 from scene.base_scene import Scene
 from utility.button import Button
 
@@ -26,25 +24,19 @@ class OverScene(Scene):
         """
         super().__init__(game)
 
-        # Fonts
-        self.title_font = pygame.font.Font(self.FONT_PATH_BOLD, self.TITLE_FONT_SIZE)
-        self.score_font = pygame.font.Font(self.FONT_PATH_BOLD, self.TEXT_FONT_SIZE)
-        self.button_font = pygame.font.Font(self.FONT_PATH_BOLD, self.BUTTON_FONT_SIZE)
-
         # Determine title text
         if self.game.is_high_score:
             title_text = "New High Score!" 
         else:
             title_text = "Game Over!"
 
-        # Render text surfaces
-        self.title_surface = self.title_font.render(
-            title_text, True, self.TEXT_COLOR_LIGHT)
+        # Initialize text surfaces
+        self.title_surface = self.title_font.render(title_text, True, self.TEXT_COLOR_LIGHT)
 
-        self.high_score_surface = self.score_font.render(
+        self.high_score_surface = self.content_font.render(
             f"High Score: {self.game.high_score}", True, self.TEXT_COLOR_LIGHT
         )
-        self.score_surface = self.score_font.render(
+        self.score_surface = self.content_font.render(
             f"Score: {self.game.last_score}", True, self.TEXT_COLOR_LIGHT
         )
 

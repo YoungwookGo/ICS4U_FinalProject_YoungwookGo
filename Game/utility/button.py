@@ -8,8 +8,6 @@
 #   This class manages the button user interface,
 #   including active/idle effects, click handling, and drawing the button on the screen.
 ##############################################
-
-# Pygame is a Python library for building 2D games and multimedia applications.
 import pygame
 
 class Button:

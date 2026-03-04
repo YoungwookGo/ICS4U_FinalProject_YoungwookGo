@@ -3,15 +3,13 @@
 # Course:       ICS4U 
 # Author:       Youngwook Go 
 # Date:         2026-03-01
-# File Name:    text_box.py 
+# File Name:    textbox.py 
 # Description:  
 #   This class handles text input actions.
 #    - Create an input box that can be reused across scenes (Menu, Game, Over).
 #    - Support mouse activation, keyboard typing, backspace deletion, and Enter submission.
 #    - Display a blinking cursor to notice typing area.
 ##############################################
-
-# Pygame is a Python library for building 2D games and multimedia applications.
 import pygame
 
 class TextBox:

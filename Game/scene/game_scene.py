@@ -16,10 +16,10 @@ import os
 import random
 
 from scene.base_scene import Scene
-from utility.button import Button, IconButton
+from utility.button import IconButton
 from utility.random_word import RandomWord
 from utility.statistic import StatsManager
-from utility.text_box import TextBox
+from utility.textbox import TextBox
 from entity.enemy import Enemy1, Enemy2, Enemy3
 
 class GameScene(Scene):
@@ -83,12 +83,6 @@ class GameScene(Scene):
         # Call utility
         self.word_api = RandomWord()
         self.stats = StatsManager()
-
-        # Fonts
-        self.inputbox_font = pygame.font.Font(self.FONT_PATH_MEDIUM, self.TEXTBOX_FONT_SIZE)
-        self.ui_font = pygame.font.Font(self.FONT_PATH_BOLD, self.TEXT_FONT_SIZE)
-        self.button_font = pygame.font.Font(self.FONT_PATH_BOLD, self.BUTTON_FONT_SIZE)
-        self.icon_font = pygame.font.Font(self.FONT_PATH_SYMBOL, self.ICON_FONT_SIZE)
         
         # Core gameplay state
         self.init_durability = self.INIT_DURABILITY
@@ -120,15 +114,15 @@ class GameScene(Scene):
         )
         self.pause_button.locate(self.game.WIDTH - 30, 30)
 
-        # Text inputbox UI
-        self.text_box = TextBox(
+        # Initialize text box
+        self.textbox = TextBox(
             font=self.inputbox_font,
             size=self.TEXTBOX_SIZE,
             text_color=self.TEXT_COLOR_DARK,
             idle_color=self.BUTTON_COLOR_IDLE,
             active_color=self.BUTTON_COLOR_ACTIVE,
         )
-        self.text_box.locate(self.center_x, self.game.HEIGHT - 80)
+        self.textbox.locate(self.center_x, self.game.HEIGHT - 80)
 
         # Enemy group
         self.enemies = pygame.sprite.Group()
@@ -192,7 +186,7 @@ class GameScene(Scene):
         Check the player's typed word against current enemies.
         """
         # Case sensitive
-        text_input = self.text_box.get_text().strip()
+        text_input = self.textbox.get_text().strip()
 
         # Do nothing when text input is empty
         if text_input == "":
@@ -219,7 +213,7 @@ class GameScene(Scene):
             # When there is no word matching with input
             self.combo = 0
 
-        self.text_box.clear()
+        self.textbox.clear()
     #end check_input()
 
     def skill1(self):
@@ -307,12 +301,12 @@ class GameScene(Scene):
         Sync paused state with input availability.
         """
         self.paused = paused
-        self.text_box.active = not paused
+        self.textbox.active = not paused
     #end set_paused()
 
     def manage_event(self, events):
         """
-        Handle input events in text_box class.
+        Handle input events in textbox class.
         - TAB: Activate Skill 1
         - Enter: Submit typed word
         """
@@ -344,7 +338,7 @@ class GameScene(Scene):
                     continue
 
             # 4) Textbox input
-            result = self.text_box.interact(event)
+            result = self.textbox.interact(event)
             if result == "enter":
                 self.check_input()
     #end manage_event()
@@ -360,7 +354,7 @@ class GameScene(Scene):
 
         # Update entities
         self.enemies.update(dt)
-        self.text_box.update(dt)
+        self.textbox.update(dt)
 
         # Handle enemies that passed the screen edge
         for enemy in list(self.enemies):
@@ -394,25 +388,25 @@ class GameScene(Scene):
         self.enemies.draw(screen)
 
         # Draw text box
-        self.text_box.draw(screen)
+        self.textbox.draw(screen)
 
         # Draw button
         self.pause_button.draw(screen)
 
         # Draw test
-        durability_surf = self.ui_font.render(
+        durability_surf = self.content_font.render(
             f"Durability: {self.durability}/{self.init_durability}", True, self.TEXT_COLOR_LIGHT)
         
-        score_surf = self.ui_font.render(
+        score_surf = self.content_font.render(
             f"Score: {self.score}", True, self.TEXT_COLOR_LIGHT)
         
-        combo_surf = self.ui_font.render(
+        combo_surf = self.content_font.render(
             f"Combo: {self.combo}", True, self.TEXT_COLOR_LIGHT)
         
-        energy_surf = self.ui_font.render(
+        energy_surf = self.content_font.render(
             f"Energy: {self.energy}", True, self.TEXT_COLOR_LIGHT)
         
-        kill_surf = self.ui_font.render(
+        kill_surf = self.content_font.render(
             f"Kill: {self.kill_count}", True, self.TEXT_COLOR_LIGHT)
 
         screen.blit(durability_surf, (20, 10))

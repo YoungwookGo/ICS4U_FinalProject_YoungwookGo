@@ -41,7 +41,7 @@ class Scene:
     QUIT_BUTTON_COLOR_ACTIVE = "#DC4646"
 
     TITLE_FONT_SIZE = 80
-    TEXT_FONT_SIZE = 32
+    CONTENT_FONT_SIZE = 32
     ICON_FONT_SIZE = 48
 
     TEXTBOX_FONT_SIZE = 48
@@ -59,6 +59,13 @@ class Scene:
         # Define center guideline
         self.center_x = self.game.WIDTH // 2
         self.center_y = self.game.HEIGHT // 2
+
+        # Shared font styles
+        self.title_font = pygame.font.Font(self.FONT_PATH_BOLD, self.TITLE_FONT_SIZE)
+        self.content_font = pygame.font.Font(self.FONT_PATH_BOLD, self.CONTENT_FONT_SIZE)
+        self.button_font = pygame.font.Font(self.FONT_PATH_BOLD, self.BUTTON_FONT_SIZE)
+        self.icon_font = pygame.font.Font(self.FONT_PATH_SYMBOL, self.ICON_FONT_SIZE)
+        self.inputbox_font = pygame.font.Font(self.FONT_PATH_MEDIUM, self.TEXTBOX_FONT_SIZE)
 
         # Scene requests
         self.request_scene = None

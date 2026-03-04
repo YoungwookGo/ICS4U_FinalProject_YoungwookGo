@@ -10,7 +10,6 @@
 #    - Allow the player to start the game or quit safely.
 #    - Demonstrate clean scene separation using OOP inheritance.
 # #####################################
-import pygame
 from scene.base_scene import Scene
 from utility.button import Button
 
@@ -19,22 +18,17 @@ class MenuScene(Scene):
     Main Menu scene.
     Displays title and button.
     """
-
-    # UI constants
-    TITLE_TEXT = "Word Defender"
-
     def __init__(self, game):
         """
         Initialize the menu scene.
         """
         super().__init__(game)
 
-        # Fonts used in this scene
-        self.title_font = pygame.font.Font(self.FONT_PATH_BOLD, self.TITLE_FONT_SIZE)
-        self.button_font = pygame.font.Font(self.FONT_PATH_BOLD, self.BUTTON_FONT_SIZE)
+        # Title text
+        self.title_text = "Word Defender"
 
-        # Create title and button
-        self.title_surface = self.title_font.render(self.TITLE_TEXT, True, self.TEXT_COLOR_LIGHT)
+        # Initialize text surfaces
+        self.title_surface = self.title_font.render(self.title_text, True, self.TEXT_COLOR_LIGHT)
 
         # Initialize buttons
         self.start_button = Button(
