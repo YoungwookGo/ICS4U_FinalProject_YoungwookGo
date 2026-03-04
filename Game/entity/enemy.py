@@ -23,7 +23,7 @@ class Enemy(pygame.sprite.Sprite):
     # Default enemy settings (subclasses can override these)
     BASE_COLOR = (255, 255, 255)
     BASE_SPEED = 120
-    BASE_DURABILITY = 1
+    BASE_DURABILITY = 1 # asdf
 
     # Movement & speed calculation constants
     START_X = -20

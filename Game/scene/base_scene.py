@@ -11,6 +11,7 @@
 #    - Centralize common quit handling (window close button).
 ##############################################
 import pygame
+import os
 
 class Scene:
     """
@@ -20,12 +21,42 @@ class Scene:
     GAME_SCENE = "game"
     MENU_SCENE = "menu"
     OVER_SCENE = "over"
+
+    # Shared file paths
+    FONT_PATH_MEDIUM = os.path.join("Game", "asset", "font", "NotoSans-Medium.ttf")
+    FONT_PATH_BOLD = os.path.join("Game", "asset", "font", "NotoSans-SemiBold.ttf")
+    WALLPAPER_DIR = os.path.join("Game", "asset", "wallpaper")
+
+    # Shared visual constants
+    BACKGROUND_COLOR = "#1E1E28"
+
+    TEXT_COLOR_LIGHT = "#FFFFFF"
+    TEXT_COLOR_DARK = "#000000"
+
+    BUTTON_COLOR_IDLE = "#C8C8C8"
+    BUTTON_COLOR_ACTIVE = "#FFFFFF"
+
+    QUIT_BUTTON_COLOR_IDLE = "#AA3232"
+    QUIT_BUTTON_COLOR_ACTIVE = "#DC4646"
+
+    TITLE_FONT_SIZE = 80
+    TEXT_FONT_SIZE = 32
+
+    TEXTBOX_FONT_SIZE = 48
+    TEXTBOX_SIZE = (1000, 80)
+
+    BUTTON_FONT_SIZE = 40
+    BUTTON_SIZE = (220, 70)
     
     def __init__(self, game):
         """
         Initialize the base scene.
         """
         self.game = game
+
+        # Define center guideline
+        self.center_x = self.game.WIDTH // 2
+        self.center_y = self.game.HEIGHT // 2
 
         # Scene requests
         self.request_scene = None

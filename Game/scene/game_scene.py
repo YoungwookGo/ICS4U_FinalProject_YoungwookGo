@@ -25,19 +25,6 @@ class GameScene(Scene):
     """
     Main game scene class for the program.
     """
-    # File paths
-    FONT_INPUT_PATH = os.path.join("Game", "asset", "font", "NotoSans-Medium.ttf")
-    FONT_UI_PATH = os.path.join("Game", "asset", "font", "NotoSans-SemiBold.ttf")
-    WALLPAPER_DIR = os.path.join("Game", "asset", "wallpaper")
-
-    # UI settings
-    INPUT_FONT_SIZE = 48
-    UI_FONT_SIZE = 32
-    INPUT_BOX_SIZE = (1000, 80)
-
-    INPUT_TEXT_COLOR = (255, 255, 255)  # White
-    INPUT_IDLE_COLOR = (70, 70, 80)
-    INPUT_ACTIVE_COLOR = (110, 110, 130)
 
     # Gameplay tuning
     INIT_DURABILITY = 5
@@ -93,8 +80,8 @@ class GameScene(Scene):
         self.stats = StatsManager()
 
         # Fonts
-        self.input_font = pygame.font.Font(self.FONT_INPUT_PATH, self.INPUT_FONT_SIZE)
-        self.ui_font = pygame.font.Font(self.FONT_UI_PATH, self.UI_FONT_SIZE)
+        self.inputbox_font = pygame.font.Font(self.FONT_PATH_MEDIUM, self.TEXTBOX_FONT_SIZE)
+        self.ui_font = pygame.font.Font(self.FONT_PATH_BOLD, self.TEXT_FONT_SIZE)
         
         # Core gameplay state
         self.init_durability = self.INIT_DURABILITY
@@ -113,22 +100,22 @@ class GameScene(Scene):
         self.bg_images = self.load_backgrounds()
         self.background = self.bg_images[0] if self.bg_images else None
 
-        # Text input UI
+        # Text inputbox UI
         self.text_box = TextBox(
-            font=self.input_font,
-            size=self.INPUT_BOX_SIZE,
-            text_color=self.INPUT_TEXT_COLOR,
-            idle_color=self.INPUT_IDLE_COLOR,
-            active_color=self.INPUT_ACTIVE_COLOR,
+            font=self.inputbox_font,
+            size=self.TEXTBOX_SIZE,
+            text_color=self.TEXT_COLOR_DARK,
+            idle_color=self.BUTTON_COLOR_IDLE,
+            active_color=self.BUTTON_COLOR_ACTIVE,
         )
 
-        # Place the input box once
+        # Place the inputbox once
         center_x = self.game.WIDTH // 2
         self.text_box.locate(center_x, self.game.HEIGHT - 80)
 
         # Enemy group
         self.enemies = pygame.sprite.Group()
-        self.spawn_start_enemies()
+        self._spawn_start_enemies()
 
         # Update background image
         self.update_background()
@@ -153,7 +140,7 @@ class GameScene(Scene):
         return images
     #end load_backgrounds()
     
-    def spawn_start_enemies(self):
+    def _spawn_start_enemies(self):
         """
         Spawn the initial enemies at fixed lane positions.
         """
@@ -162,7 +149,7 @@ class GameScene(Scene):
             word = self.word_api.get_word() or "ohno"
             enemy = Enemy1(self.game, y, word=word)
             self.enemies.add(enemy)
-    #end spawn_start_enemies()
+    #end _spawn_start_enemies()
 
     def update_background(self):
         """
@@ -187,10 +174,16 @@ class GameScene(Scene):
 
         # Manage every events from referenced classes
         for event in events:
-            # Skill 1
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_TAB:
-                self.skill1()
-                continue
+
+            if event.type == pygame.KEYDOWN:
+                # Escape game
+                if event.key == pygame.K_ESCAPE:
+                    self.request_scene = self.OVER_SCENE
+                
+                # Skill 1
+                if event.key == pygame.K_TAB:
+                    self.skill1()
+                    continue
 
             # Text enter
             result = self.text_box.interact(event)
@@ -361,15 +354,24 @@ class GameScene(Scene):
         self.enemies.draw(screen)
 
         # UI
-        durability_surf = self.ui_font.render(f"Durability: {self.durability}/{self.init_durability}", True, self.INPUT_TEXT_COLOR)
-        score_surf = self.ui_font.render(f"Score: {self.score}", True, self.INPUT_TEXT_COLOR)
-        combo_surf = self.ui_font.render(f"Combo: {self.combo}", True, self.INPUT_TEXT_COLOR)
-        energy_surf = self.ui_font.render(f"Energy: {self.energy}", True, self.INPUT_TEXT_COLOR)
-        kill_surf = self.ui_font.render(f"Kill: {self.kill_count}", True, self.INPUT_TEXT_COLOR)
+        durability_surf = self.ui_font.render(
+            f"Durability: {self.durability}/{self.init_durability}", True, self.TEXT_COLOR_LIGHT)
+        
+        score_surf = self.ui_font.render(
+            f"Score: {self.score}", True, self.TEXT_COLOR_LIGHT)
+        
+        combo_surf = self.ui_font.render(
+            f"Combo: {self.combo}", True, self.TEXT_COLOR_LIGHT)
+        
+        energy_surf = self.ui_font.render(
+            f"Energy: {self.energy}", True, self.TEXT_COLOR_LIGHT)
+        
+        kill_surf = self.ui_font.render(
+            f"Kill: {self.kill_count}", True, self.TEXT_COLOR_LIGHT)
 
         screen.blit(durability_surf, (20, 10))
-        screen.blit(score_surf, (200, 10))
-        screen.blit(combo_surf, (400, 10))
-        screen.blit(energy_surf, (600, 10))
+        screen.blit(score_surf, (300, 10))
+        screen.blit(combo_surf, (500, 10))
+        screen.blit(energy_surf, (700, 10))
         screen.blit(kill_surf, (20, 45))
     #end draw()

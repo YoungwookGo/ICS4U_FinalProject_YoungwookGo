@@ -21,20 +21,7 @@ class MenuScene(Scene):
     """
 
     # UI constants
-    BG_COLOR = (30, 30, 40)
-    TITLE_COLOR = (255, 255, 255)
-
     TITLE_TEXT = "Word Defender"
-
-    TITLE_SIZE = 80
-    BUTTON_TEXT_SIZE = 40
-    BUTTON_SIZE = (220, 70)
-
-    TITLE_OFFSET_Y = -100
-    START_BUTTON_OFFSET_Y = 20
-    QUIT_BUTTON_OFFSET_Y = 110
-
-    FONT_PATH = "Game/asset/font/NotoSans-SemiBold.ttf"
 
     def __init__(self, game):
         """
@@ -43,11 +30,11 @@ class MenuScene(Scene):
         super().__init__(game)
 
         # Fonts used in this scene
-        self.title_font = pygame.font.Font(self.FONT_PATH, self.TITLE_SIZE)
-        self.button_font = pygame.font.Font(self.FONT_PATH, self.BUTTON_TEXT_SIZE)
+        self.title_font = pygame.font.Font(self.FONT_PATH_BOLD, self.TITLE_FONT_SIZE)
+        self.button_font = pygame.font.Font(self.FONT_PATH_BOLD, self.BUTTON_FONT_SIZE)
 
         # Create title and button
-        self.title_surface = self.title_font.render(self.TITLE_TEXT, True, self.TITLE_COLOR)
+        self.title_surface = self.title_font.render(self.TITLE_TEXT, True, self.TEXT_COLOR_LIGHT)
 
         # Create buttons
         self.start_button = Button(
@@ -68,13 +55,9 @@ class MenuScene(Scene):
             active_color=(220, 70, 70),
         )
 
-        # Define center guideline
-        self.center_x = self.game.WIDTH // 2
-        self.center_y = self.game.HEIGHT // 2
-
         # Place buttons once
-        self.start_button.locate(self.center_x, self.center_y + self.START_BUTTON_OFFSET_Y)
-        self.quit_button.locate(self.center_x, self.center_y + self.QUIT_BUTTON_OFFSET_Y)
+        self.start_button.locate(self.center_x, self.center_y + 20)
+        self.quit_button.locate(self.center_x, self.center_y + 110)
     #end __init__()
 
     def manage_event(self, events):
@@ -105,15 +88,15 @@ class MenuScene(Scene):
         Draw the menu UI (background, title, and buttons).
         """
         # Reset screen
-        screen.fill(self.BG_COLOR)
+        screen.fill(self.BACKGROUND_COLOR)
 
-        # Draw title 
+        # Draw texts 
         title_rect = self.title_surface.get_rect(
-            center=(self.center_x, self.center_y + self.TITLE_OFFSET_Y)
+            center=(self.center_x, self.center_y -100)
         )
         screen.blit(self.title_surface, title_rect)
 
-        # Draw button
+        # Draw buttons
         self.start_button.draw(screen)
         self.quit_button.draw(screen)
     #end draw()

@@ -11,6 +11,7 @@
 #    - Keep scene transitions controlled by request flags.
 # #####################################
 import pygame
+import os
 from scene.base_scene import Scene
 from utility.button import Button
 
@@ -19,29 +20,6 @@ class OverScene(Scene):
     Gave Over scene.
     Displays statistics and button.
     """
-    # Visual constants
-    BG_COLOR = (30, 30, 40)
-    TEXT_COLOR = (255, 255, 255) # white
-    IDLE_COLOR = (200, 200, 200) # Light Gray
-    BLACK_COLOR = (0, 0, 0)
-
-    # Layout constants
-    TITLE_OFFSET_Y = -100
-    SCORE_OFFSET_Y = -20
-    HIGH_SCORE_OFFSET_Y = 25
-    BUTTON_OFFSET_Y = 110
-    BUTTON_GAP_X = 120
-    BUTTON_OFFSET_STAT = 200
-
-    # Font settings
-    FONT_PATH = "Game/asset/font/NotoSans-SemiBold.ttf"
-    TITLE_FONT_SIZE = 80
-    SCORE_FONT_SIZE = 36
-    BUTTON_FONT_SIZE = 40
-
-    # Button settings
-    BUTTON_SIZE = (220, 70)
-
     def __init__(self, game):
         """
         Initialize the game-over screen resources and UI.
@@ -49,27 +27,25 @@ class OverScene(Scene):
         super().__init__(game)
 
         # Fonts
-        self.title_font = pygame.font.Font(self.FONT_PATH, self.TITLE_FONT_SIZE)
-        self.score_font = pygame.font.Font(self.FONT_PATH, self.SCORE_FONT_SIZE)
-        self.button_font = pygame.font.Font(self.FONT_PATH, self.BUTTON_FONT_SIZE)
+        self.title_font = pygame.font.Font(self.FONT_PATH_BOLD, self.TITLE_FONT_SIZE)
+        self.score_font = pygame.font.Font(self.FONT_PATH_BOLD, self.TEXT_FONT_SIZE)
+        self.button_font = pygame.font.Font(self.FONT_PATH_BOLD, self.BUTTON_FONT_SIZE)
 
-        # Define center guideline
-        self.center_x = self.game.WIDTH // 2
-        self.center_y = self.game.HEIGHT // 2
-
-        # Title text depends on whether a new high score was achieved
+        # Determine title text
         if self.game.is_high_score:
             title_text = "New High Score!" 
         else:
             title_text = "Game Over!"
-        self.title_surface = self.title_font.render(title_text, True, self.TEXT_COLOR)
 
-        # Score text surfaces
+        # Render text surfaces
+        self.title_surface = self.title_font.render(
+            title_text, True, self.TEXT_COLOR_LIGHT)
+
         self.high_score_surface = self.score_font.render(
-            f"High Score: {self.game.high_score}", True, self.TEXT_COLOR
+            f"High Score: {self.game.high_score}", True, self.TEXT_COLOR_LIGHT
         )
         self.score_surface = self.score_font.render(
-            f"Score: {self.game.last_score}", True, self.TEXT_COLOR
+            f"Score: {self.game.last_score}", True, self.TEXT_COLOR_LIGHT
         )
 
         # Buttons
@@ -77,33 +53,33 @@ class OverScene(Scene):
             font=self.button_font,
             text="START",
             size=self.BUTTON_SIZE,
-            text_color=self.BLACK_COLOR,
-            idle_color=self.IDLE_COLOR,
-            active_color=self.TEXT_COLOR,
+            text_color=self.TEXT_COLOR_DARK,
+            idle_color=self.BUTTON_COLOR_IDLE,
+            active_color=self.BUTTON_COLOR_ACTIVE,
         )
 
-        self.menu_button = Button(
+        self.quit_button = Button(
             font=self.button_font,
-            text="MENU",
+            text="QUIT",
             size=self.BUTTON_SIZE,
-            text_color=self.BLACK_COLOR,
-            idle_color=self.IDLE_COLOR,
-            active_color=self.TEXT_COLOR,
+            text_color=self.TEXT_COLOR_LIGHT,
+            idle_color=self.QUIT_BUTTON_COLOR_IDLE,
+            active_color=self.QUIT_BUTTON_COLOR_ACTIVE,
         )
 
         self.stat_button = Button(
             font=self.button_font,
             text="STAT",
             size=self.BUTTON_SIZE,
-            text_color=(0, 0, 0),
-            idle_color=self.IDLE_COLOR,
-            active_color=self.TEXT_COLOR,
+            text_color=self.TEXT_COLOR_DARK,
+            idle_color=self.BUTTON_COLOR_IDLE,
+            active_color=self.BUTTON_COLOR_ACTIVE,
         )
 
-        # Place buttons once
-        self.start_button.locate(self.center_x - self.BUTTON_GAP_X, self.center_y + self.BUTTON_OFFSET_Y)
-        self.menu_button.locate(self.center_x + self.BUTTON_GAP_X, self.center_y + self.BUTTON_OFFSET_Y)
-        # self.stat_button.locate(self.center_x, self.center_y + self.BUTTON_OFFSET_STAT)
+        # Place buttons
+        self.start_button.locate(self.center_x - 120, self.center_y + 110)
+        self.quit_button.locate(self.center_x + 120, self.center_y + 110)
+        # self.stat_button.locate(self.center_x, self.center_y + 200) 
     #end __init__()
 
     def manage_event(self, events):
@@ -113,11 +89,12 @@ class OverScene(Scene):
         super().manage_event(events)
 
         for event in events:
+            # Button events
             if self.start_button.interact(event):
                 self.request_scene = self.GAME_SCENE
 
-            if self.menu_button.interact(event):
-                self.request_scene = self.MENU_SCENE
+            if self.quit_button.interact(event):
+                self.request_quit = True
     #end manage_event()
 
     def update(self):
@@ -129,28 +106,26 @@ class OverScene(Scene):
         Draw title, score summary, and menu buttons.
         """
         # Reset screen
-        screen.fill(self.BG_COLOR)
+        screen.fill(self.BACKGROUND_COLOR)
 
-        # Title 
+        # Draw texts
         title_rect = self.title_surface.get_rect(
-            center=(self.center_x, self.center_y + self.TITLE_OFFSET_Y)
+            center=(self.center_x, self.center_y - 100)
         )
-        screen.blit(self.title_surface, title_rect)
-
-        # Scores
         score_rect = self.score_surface.get_rect(
-            center=(self.center_x, self.center_y + self.SCORE_OFFSET_Y)
+            center=(self.center_x, self.center_y - 20)
         )
         high_score_rect = self.high_score_surface.get_rect(
-            center=(self.center_x, self.center_y + self.HIGH_SCORE_OFFSET_Y)
+            center=(self.center_x, self.center_y + 25)
         )
 
+        screen.blit(self.title_surface, title_rect)
         screen.blit(self.score_surface, score_rect)
         screen.blit(self.high_score_surface, high_score_rect)
 
-        # Buttons
+        # Draw buttons
         self.start_button.draw(screen)
-        self.menu_button.draw(screen)
-        # self.stat_button.draw(screen)
+        self.quit_button.draw(screen)
+
     #end draw()
 #end class OverScene
