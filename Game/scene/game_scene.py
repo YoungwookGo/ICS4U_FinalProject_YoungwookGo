@@ -16,7 +16,7 @@ import os
 import random
 
 from scene.base_scene import Scene
-from utility.button import IconButton
+from utility.button import Button, IconButton
 from utility.random_word import RandomWord
 from utility.statistic import StatsManager
 from utility.textbox import TextBox
@@ -99,11 +99,17 @@ class GameScene(Scene):
         self.max_combo = 0
         self.kill_count = 0
 
-        # Background images
+        # Initialize background images
         self.bg_images = self._load_backgrounds()
         self.background = self.bg_images[0] if self.bg_images else None
 
-        # Initialize buttons
+        # Update background image once
+        self.update_background()
+
+        # Initialize pause menu
+        self._load_pause_menu()
+
+        # Initialize pause button
         self.pause_button = IconButton(
             font=self.icon_font,
             text="☰",
@@ -124,12 +130,9 @@ class GameScene(Scene):
         )
         self.textbox.locate(self.center_x, self.game.HEIGHT - 80)
 
-        # Enemy group
+        # Initialize enemy sprite group
         self.enemies = pygame.sprite.Group()
         self._spawn_init_enemies()
-
-        # Update background image
-        self.update_background()
     #end __init__()
 
     def _load_backgrounds(self):
@@ -150,6 +153,75 @@ class GameScene(Scene):
         # Return list of loaded image.
         return images
     #end _load_backgrounds()
+
+    def _load_pause_menu(self):
+        """
+        Load pause menu
+        """
+
+        # Initialize pause overlay
+        self.overlay = pygame.Surface((self.game.WIDTH, self.game.HEIGHT), pygame.SRCALPHA)
+        self.overlay.fill((0, 0, 0, 80))
+        
+        # Initialize pause menu bar
+        menu_bar_size = (self.game.WIDTH, self.BUTTON_SIZE[1] * 2)
+
+        self.bar_surf = pygame.Surface((menu_bar_size), pygame.SRCALPHA)
+        self.bar_surf.fill((0, 0, 0, 160))
+
+        self.bar_rect = self.bar_surf.get_rect()
+        self.bar_rect.centerx = self.center_x
+        self.bar_rect.bottom = self.game.HEIGHT
+
+        # Initialize pause menu title
+        menu_title_size = (int(self.game.WIDTH * 0.5), int(self.game.HEIGHT * 0.4))
+
+        self.title_surf = pygame.Surface(menu_title_size)
+        pygame.draw.rect(self.title_surf, self.PAUSE_MENU_COLOR, self.title_surf.get_rect(),border_radius=24)
+
+        self.title_rect = self.title_surf.get_rect()
+        self.title_rect.centerx = self.center_x
+        self.title_rect.centery = (self.game.HEIGHT - menu_bar_size[1]) // 2 # Menu placed at adjusted center
+
+        # Initialize pause menu texts
+        self.paused_surf = self.title_font.render("PAUSED!", True, self.TEXT_COLOR_DARK)
+        self.paused_rect = self.paused_surf.get_rect(
+            center=(self.title_rect.centerx, self.title_rect.centery - 40)
+        )
+
+        self.resume_surf = self.content_font.render("Press any key to resume", True, self.TEXT_COLOR_DARK)
+        self.resume_rect = self.resume_surf.get_rect(center=(self.center_x, self.center_y))
+
+        # Initialize pause menu buttons
+        self.quit_button = Button(
+            font=self.content_font,
+            text="Quit",
+            size=self.BUTTON_SIZE,
+            text_color=self.TEXT_COLOR_LIGHT,
+            idle_color=self.QUIT_BUTTON_COLOR_IDLE,
+            active_color=self.QUIT_BUTTON_COLOR_ACTIVE,
+        )
+        self.quit_button.locate(self.center_x - 240, self.game.HEIGHT - self.BUTTON_SIZE[1])
+
+        self.continue_button = Button(
+            font=self.content_font,
+            text="Continue",
+            size=self.BUTTON_SIZE,
+            text_color=self.TEXT_COLOR_DARK,
+            idle_color=self.BUTTON_COLOR_IDLE,
+            active_color=self.BUTTON_COLOR_ACTIVE,
+        )
+        self.continue_button.locate(self.center_x, self.game.HEIGHT - self.BUTTON_SIZE[1])
+        
+        self.gameover_button = Button(
+            font=self.content_font,
+            text="Game Over",
+            size=self.BUTTON_SIZE,
+            text_color=self.TEXT_COLOR_DARK,
+            idle_color=self.BUTTON_COLOR_IDLE,
+            active_color=self.BUTTON_COLOR_ACTIVE,
+        )
+        self.gameover_button.locate(self.center_x + 240, self.game.HEIGHT - self.BUTTON_SIZE[1])
     
     def _spawn_init_enemies(self):
         """
@@ -326,6 +398,18 @@ class GameScene(Scene):
 
             # 2) If paused: allow only resume input, block others
             if self.paused == True:
+                if self.quit_button.interact(event):
+                    self.request_quit = True
+                    continue
+
+                if self.gameover_button.interact(event):
+                    self.game_over()
+                    continue
+
+                if self.continue_button.interact(event):
+                    self.set_paused(not self.paused)
+                    continue
+
                 if event.type == pygame.KEYDOWN:
                     self.set_paused(False)
                 continue
@@ -387,31 +471,51 @@ class GameScene(Scene):
         # Draw enemy
         self.enemies.draw(screen)
 
-        # Draw text box
-        self.textbox.draw(screen)
-
         # Draw button
         self.pause_button.draw(screen)
 
+        # Draw text box only during active gameplay
+        if not self.paused:
+            self.textbox.draw(screen)
+
         # Draw test
         durability_surf = self.content_font.render(
-            f"Durability: {self.durability}/{self.init_durability}", True, self.TEXT_COLOR_LIGHT)
+            f"Durability: {self.durability}/{self.init_durability}", True, self.TEXT_COLOR_RED)
         
         score_surf = self.content_font.render(
-            f"Score: {self.score}", True, self.TEXT_COLOR_LIGHT)
+            f"Score: {self.score}", True, self.TEXT_COLOR_CYAN)
         
         combo_surf = self.content_font.render(
-            f"Combo: {self.combo}", True, self.TEXT_COLOR_LIGHT)
+            f"Combo: {self.combo}", True, self.TEXT_COLOR_CYAN)
         
         energy_surf = self.content_font.render(
-            f"Energy: {self.energy}", True, self.TEXT_COLOR_LIGHT)
+            f"Energy: {self.energy}", True, self.TEXT_COLOR_YELLOW)
         
         kill_surf = self.content_font.render(
-            f"Kill: {self.kill_count}", True, self.TEXT_COLOR_LIGHT)
+            f"Kills: {self.kill_count}", True, self.TEXT_COLOR_YELLOW)
 
         screen.blit(durability_surf, (20, 10))
         screen.blit(score_surf, (300, 10))
         screen.blit(combo_surf, (500, 10))
-        screen.blit(energy_surf, (700, 10))
-        screen.blit(kill_surf, (20, 45))
+        screen.blit(energy_surf, (720, 10))
+        screen.blit(kill_surf, (950, 10))
+
+        # Overdraw pause menu when paused
+        if self.paused:
+            self._draw_pause_menu(screen)
     #end draw()
+
+    def _draw_pause_menu(self, screen):
+        # Darken the game scene
+        screen.blit(self.overlay, (0, 0))
+
+        # Draw pause screen panels and text
+        screen.blit(self.bar_surf, self.bar_rect)
+        screen.blit(self.title_surf, self.title_rect)
+        screen.blit(self.paused_surf, self.paused_rect)
+        screen.blit(self.resume_surf, self.resume_rect)
+
+        # Draw pause screen buttons
+        self.quit_button.draw(screen)
+        self.gameover_button.draw(screen)
+        self.continue_button.draw(screen)

@@ -37,7 +37,7 @@ class OverScene(Scene):
             f"High Score: {self.game.high_score}", True, self.TEXT_COLOR_LIGHT
         )
         self.score_surface = self.content_font.render(
-            f"Score: {self.game.last_score}", True, self.TEXT_COLOR_LIGHT
+            f"Your Score: {self.game.last_score}", True, self.TEXT_COLOR_LIGHT
         )
 
         # Initialize buttons
@@ -101,7 +101,7 @@ class OverScene(Scene):
         screen.fill(self.BACKGROUND_COLOR)
 
         # Draw texts
-        title_rect = self.title_surface.get_rect(
+        menu_title_rect = self.title_surface.get_rect(
             center=(self.center_x, self.center_y - 100)
         )
         score_rect = self.score_surface.get_rect(
@@ -111,7 +111,7 @@ class OverScene(Scene):
             center=(self.center_x, self.center_y + 25)
         )
 
-        screen.blit(self.title_surface, title_rect)
+        screen.blit(self.title_surface, menu_title_rect)
         screen.blit(self.score_surface, score_rect)
         screen.blit(self.high_score_surface, high_score_rect)
 

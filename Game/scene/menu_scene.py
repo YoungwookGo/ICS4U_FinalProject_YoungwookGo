@@ -84,10 +84,10 @@ class MenuScene(Scene):
         screen.fill(self.BACKGROUND_COLOR)
 
         # Draw texts 
-        title_rect = self.title_surface.get_rect(
+        menu_title_rect = self.title_surface.get_rect(
             center=(self.center_x, self.center_y -100)
         )
-        screen.blit(self.title_surface, title_rect)
+        screen.blit(self.title_surface, menu_title_rect)
 
         # Draw buttons
         self.start_button.draw(screen)
