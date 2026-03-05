@@ -193,35 +193,30 @@ class GameScene(Scene):
         self.resume_rect = self.resume_surf.get_rect(center=(self.center_x, self.center_y))
 
         # Initialize pause menu buttons
-        self.quit_button = Button(
-            font=self.content_font,
-            text="Quit",
-            size=self.BUTTON_SIZE,
-            text_color=self.TEXT_COLOR_LIGHT,
-            idle_color=self.QUIT_BUTTON_COLOR_IDLE,
-            active_color=self.QUIT_BUTTON_COLOR_ACTIVE,
-        )
-        self.quit_button.locate(self.center_x - 240, self.game.HEIGHT - self.BUTTON_SIZE[1])
-
         self.continue_button = Button(
-            font=self.content_font,
+            font=self.button_font,
             text="Continue",
             size=self.BUTTON_SIZE,
             text_color=self.TEXT_COLOR_DARK,
-            idle_color=self.BUTTON_COLOR_IDLE,
-            active_color=self.BUTTON_COLOR_ACTIVE,
+            idle_color=self.START_BUTTON_COLOR_IDLE,
+            active_color=self.START_BUTTON_COLOR_ACTIVE,
         )
-        self.continue_button.locate(self.center_x, self.game.HEIGHT - self.BUTTON_SIZE[1])
         
         self.gameover_button = Button(
-            font=self.content_font,
+            font=self.button_font,
             text="Game Over",
             size=self.BUTTON_SIZE,
             text_color=self.TEXT_COLOR_DARK,
             idle_color=self.BUTTON_COLOR_IDLE,
             active_color=self.BUTTON_COLOR_ACTIVE,
         )
-        self.gameover_button.locate(self.center_x + 240, self.game.HEIGHT - self.BUTTON_SIZE[1])
+
+        button_bar_y = self.game.HEIGHT - self.BUTTON_SIZE[1]
+
+        self.quit_button.locate(self.center_x - 360, button_bar_y)
+        self.guide_button.locate(self.center_x - 120, button_bar_y)
+        self.gameover_button.locate(self.center_x + 120, button_bar_y)
+        self.continue_button.locate(self.center_x + 360, button_bar_y)
     
     def _spawn_init_enemies(self):
         """
@@ -517,5 +512,6 @@ class GameScene(Scene):
 
         # Draw pause screen buttons
         self.quit_button.draw(screen)
+        self.guide_button.draw(screen)
         self.gameover_button.draw(screen)
         self.continue_button.draw(screen)

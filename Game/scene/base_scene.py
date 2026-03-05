@@ -12,6 +12,7 @@
 ##############################################
 import pygame
 import os
+from utility.button import Button 
 
 class Scene:
     """
@@ -40,6 +41,9 @@ class Scene:
     BUTTON_COLOR_IDLE = "#C8C8C8"
     BUTTON_COLOR_ACTIVE = "#FFFFFF"
 
+    START_BUTTON_COLOR_IDLE = "#32AA32"
+    START_BUTTON_COLOR_ACTIVE = "#46DC46"
+
     QUIT_BUTTON_COLOR_IDLE = "#AA3232"
     QUIT_BUTTON_COLOR_ACTIVE = "#DC4646"
 
@@ -52,7 +56,7 @@ class Scene:
     TEXTBOX_FONT_SIZE = 48
     TEXTBOX_SIZE = (1000, 80)
 
-    BUTTON_FONT_SIZE = 40
+    BUTTON_FONT_SIZE = 36
     BUTTON_SIZE = (220, 70)
     
     def __init__(self, game):
@@ -71,6 +75,34 @@ class Scene:
         self.button_font = pygame.font.Font(self.FONT_PATH_BOLD, self.BUTTON_FONT_SIZE)
         self.icon_font = pygame.font.Font(self.FONT_PATH_SYMBOL, self.ICON_FONT_SIZE)
         self.inputbox_font = pygame.font.Font(self.FONT_PATH_MEDIUM, self.TEXTBOX_FONT_SIZE)
+
+        # Shared button
+        self.quit_button = Button(
+            font=self.button_font,
+            text="Quit",
+            size=self.BUTTON_SIZE,
+            text_color=self.TEXT_COLOR_LIGHT,
+            idle_color=self.QUIT_BUTTON_COLOR_IDLE,
+            active_color=self.QUIT_BUTTON_COLOR_ACTIVE,
+        )
+
+        self.start_button = Button(
+            font=self.button_font,
+            text="Start",
+            size=self.BUTTON_SIZE,
+            text_color=self.TEXT_COLOR_DARK,
+            idle_color=self.START_BUTTON_COLOR_IDLE,
+            active_color=self.START_BUTTON_COLOR_ACTIVE,
+        )
+
+        self.guide_button = Button(
+            font=self.button_font,
+            text="Guide",
+            size=self.BUTTON_SIZE,
+            text_color=self.TEXT_COLOR_DARK,
+            idle_color=self.BUTTON_COLOR_IDLE,
+            active_color=self.BUTTON_COLOR_ACTIVE,
+        )
 
         # Scene requests
         self.request_scene = None

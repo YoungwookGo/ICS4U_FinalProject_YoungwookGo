@@ -36,7 +36,6 @@ import sys
 # Import scenes
 from scene.menu_scene import MenuScene
 from scene.game_scene import GameScene
-from scene.over_scene import OverScene
 
 class Game:
     """
@@ -126,7 +125,7 @@ class Game:
         elif scene_key == "game":
             self.scene = GameScene(self)
         elif scene_key == "over":
-            self.scene = OverScene(self)
+            self.scene = MenuScene(self, "GAMEOVER")
         else:
             # Invalid request should not crash the program
             print(f"Game ERROR: Invalid scene request -> {scene_key}")
