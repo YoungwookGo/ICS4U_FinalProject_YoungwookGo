@@ -16,10 +16,11 @@ import os
 import random
 
 from scene.base_scene import Scene
-from utility.button import Button, IconButton
+from utility.button import IconButton
 from utility.random_word import RandomWord
 from utility.statistic import StatsManager
 from utility.textbox import TextBox
+from utility.overlay_menu import OverlayMenuManager, PauseOverlayMenu, GuideOverlayMenu
 from entity.enemy import Enemy1, Enemy2, Enemy3
 
 class GameScene(Scene):
@@ -90,7 +91,7 @@ class GameScene(Scene):
 
         self.score = 0
         self.combo = 0
-        self.stage = 1
+        self.stage = 8
         self.energy = 0
 
         self.paused = False
@@ -106,8 +107,10 @@ class GameScene(Scene):
         # Update background image once
         self.update_background()
 
-        # Initialize pause menu
-        self._load_pause_menu()
+        # Initialize overlay menus
+        self.overlay_menu = OverlayMenuManager(self.game, self)
+        self.overlay_menu.register("paused", PauseOverlayMenu(self.game, self))
+        self.overlay_menu.register("guide", GuideOverlayMenu(self.game, self))
 
         # Initialize pause button
         self.pause_button = IconButton(
@@ -154,70 +157,6 @@ class GameScene(Scene):
         return images
     #end _load_backgrounds()
 
-    def _load_pause_menu(self):
-        """
-        Load pause menu
-        """
-
-        # Initialize pause overlay
-        self.overlay = pygame.Surface((self.game.WIDTH, self.game.HEIGHT), pygame.SRCALPHA)
-        self.overlay.fill((0, 0, 0, 80))
-        
-        # Initialize pause menu bar
-        menu_bar_size = (self.game.WIDTH, self.BUTTON_SIZE[1] * 2)
-
-        self.bar_surf = pygame.Surface((menu_bar_size), pygame.SRCALPHA)
-        self.bar_surf.fill((0, 0, 0, 160))
-
-        self.bar_rect = self.bar_surf.get_rect()
-        self.bar_rect.centerx = self.center_x
-        self.bar_rect.bottom = self.game.HEIGHT
-
-        # Initialize pause menu title
-        menu_title_size = (int(self.game.WIDTH * 0.5), int(self.game.HEIGHT * 0.4))
-
-        self.title_surf = pygame.Surface(menu_title_size)
-        pygame.draw.rect(self.title_surf, self.PAUSE_MENU_COLOR, self.title_surf.get_rect(),border_radius=24)
-
-        self.title_rect = self.title_surf.get_rect()
-        self.title_rect.centerx = self.center_x
-        self.title_rect.centery = (self.game.HEIGHT - menu_bar_size[1]) // 2 # Menu placed at adjusted center
-
-        # Initialize pause menu texts
-        self.paused_surf = self.title_font.render("PAUSED!", True, self.TEXT_COLOR_DARK)
-        self.paused_rect = self.paused_surf.get_rect(
-            center=(self.title_rect.centerx, self.title_rect.centery - 40)
-        )
-
-        self.resume_surf = self.content_font.render("Press any key to resume", True, self.TEXT_COLOR_DARK)
-        self.resume_rect = self.resume_surf.get_rect(center=(self.center_x, self.center_y))
-
-        # Initialize pause menu buttons
-        self.continue_button = Button(
-            font=self.button_font,
-            text="Continue",
-            size=self.BUTTON_SIZE,
-            text_color=self.TEXT_COLOR_DARK,
-            idle_color=self.START_BUTTON_COLOR_IDLE,
-            active_color=self.START_BUTTON_COLOR_ACTIVE,
-        )
-        
-        self.gameover_button = Button(
-            font=self.button_font,
-            text="Game Over",
-            size=self.BUTTON_SIZE,
-            text_color=self.TEXT_COLOR_DARK,
-            idle_color=self.BUTTON_COLOR_IDLE,
-            active_color=self.BUTTON_COLOR_ACTIVE,
-        )
-
-        button_bar_y = self.game.HEIGHT - self.BUTTON_SIZE[1]
-
-        self.quit_button.locate(self.center_x - 360, button_bar_y)
-        self.guide_button.locate(self.center_x - 120, button_bar_y)
-        self.gameover_button.locate(self.center_x + 120, button_bar_y)
-        self.continue_button.locate(self.center_x + 360, button_bar_y)
-    
     def _spawn_init_enemies(self):
         """
         Spawn the initial enemies at fixed lane positions.
@@ -369,6 +308,10 @@ class GameScene(Scene):
         """
         self.paused = paused
         self.textbox.active = not paused
+        if paused:
+            self.overlay_menu.open("paused")
+        else:
+            self.overlay_menu.close()
     #end set_paused()
 
     def manage_event(self, events):
@@ -391,22 +334,10 @@ class GameScene(Scene):
                 self.set_paused(not self.paused)
                 continue
 
-            # 2) If paused: allow only resume input, block others
-            if self.paused == True:
-                if self.quit_button.interact(event):
-                    self.request_quit = True
-                    continue
-
-                if self.gameover_button.interact(event):
-                    self.game_over()
-                    continue
-
-                if self.continue_button.interact(event):
-                    self.set_paused(not self.paused)
-                    continue
-
-                if event.type == pygame.KEYDOWN:
-                    self.set_paused(False)
+            # 2) If paused, handle menu events from overlay menu
+            if self.paused:
+                action = self.overlay_menu.handle_event(event)
+                self._manage_overlay_event(action)
                 continue
 
             # 3) Normal gameplay inputs
@@ -421,6 +352,36 @@ class GameScene(Scene):
             if result == "enter":
                 self.check_input()
     #end manage_event()
+
+    def _manage_overlay_event(self, action):
+        """
+        Handle action returned from the currently active overlay menu.
+        Returns True when an action was handled.
+        """
+        if action is None:
+            return False
+
+        if action == "quit":
+            self.request_quit = True
+            return True
+        elif action == "guide":
+            self.overlay_menu.open("guide")
+            return True
+        elif action == "back":
+            self.overlay_menu.open("paused")
+            return True
+        elif action == "game_over":
+            self.game_over()
+            return True
+        elif action == "continue":
+            self.set_paused(False)
+            return True
+        elif action == "resume_by_key":
+            self.set_paused(False)
+            return True
+        else:
+            return False
+    #end _manage_overlay_event()
 
     def update(self):
         """
@@ -497,21 +458,5 @@ class GameScene(Scene):
 
         # Overdraw pause menu when paused
         if self.paused:
-            self._draw_pause_menu(screen)
+            self.overlay_menu.draw(screen)
     #end draw()
-
-    def _draw_pause_menu(self, screen):
-        # Darken the game scene
-        screen.blit(self.overlay, (0, 0))
-
-        # Draw pause screen panels and text
-        screen.blit(self.bar_surf, self.bar_rect)
-        screen.blit(self.title_surf, self.title_rect)
-        screen.blit(self.paused_surf, self.paused_rect)
-        screen.blit(self.resume_surf, self.resume_rect)
-
-        # Draw pause screen buttons
-        self.quit_button.draw(screen)
-        self.guide_button.draw(screen)
-        self.gameover_button.draw(screen)
-        self.continue_button.draw(screen)

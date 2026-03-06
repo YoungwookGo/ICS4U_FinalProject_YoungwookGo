@@ -30,7 +30,7 @@ class Scene:
     WALLPAPER_DIR = os.path.join("Game", "asset", "wallpaper")
 
     # Shared visual constants
-    BACKGROUND_COLOR = "#1E1E28"
+    BACKGROUND_COLOR = "#3B3B5F"
 
     TEXT_COLOR_LIGHT = "#FFFFFF"
     TEXT_COLOR_DARK = "#000000"

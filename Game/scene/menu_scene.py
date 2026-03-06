@@ -11,7 +11,7 @@
 #    - Demonstrate clean scene separation using OOP inheritance.
 # #####################################
 from scene.base_scene import Scene
-from utility.button import Button
+from utility.overlay_menu import OverlayMenuManager, GuideOverlayMenu
 
 class MenuScene(Scene):
     """
@@ -38,6 +38,10 @@ class MenuScene(Scene):
         self.quit_button.locate(self.center_x - 240, self.center_y + 110)
         self.guide_button.locate(self.center_x, self.center_y + 110)
         self.start_button.locate(self.center_x + 240, self.center_y + 110)
+
+        # Initialize overlay menus
+        self.overlay_menu = OverlayMenuManager(self.game, self)
+        self.overlay_menu.register("guide", GuideOverlayMenu(self.game, self))
     #end __init__()
 
     def _status_neutral(self):
@@ -66,6 +70,17 @@ class MenuScene(Scene):
         super().manage_event(events)
 
         for event in events:
+            # When an overlay is open, handle only overlay events.
+            if self.overlay_menu.is_open():
+                action = self.overlay_menu.handle_event(event)
+                self._manage_overlay_event(action)
+                continue
+
+            # GUIDE button opens guide overlay.
+            if self.guide_button.interact(event):
+                self.overlay_menu.open("guide")
+                continue
+
             # START button requests the game scene.
             if self.start_button.interact(event):
                 self.request_scene = self.GAME_SCENE
@@ -74,6 +89,14 @@ class MenuScene(Scene):
             if self.quit_button.interact(event):
                 self.request_quit = True
     #end manage_event()
+
+    def _manage_overlay_event(self, action):
+        """
+        Handle action returned from the currently active overlay menu.
+        """
+        if action == "back":
+            self.overlay_menu.close()
+    #end _manage_overlay_event()
 
     def update(self):
         """
@@ -102,6 +125,9 @@ class MenuScene(Scene):
 
         if self.status == "GAMEOVER":
             self._draw_gameover(screen)
+
+        # Draw overlay on top if opened.
+        self.overlay_menu.draw(screen)
     #end draw()
 
     def _draw_gameover(self, screen):
