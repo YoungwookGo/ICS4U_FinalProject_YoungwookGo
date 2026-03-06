@@ -412,9 +412,9 @@ class GameScene(Scene):
                 # Reset combo when the player misses an enemy
                 self.combo = 0
 
-            # Game over check (after processing all passed enemies)
-            if self.durability <= 0:
-                self.game_over()
+        # Game over check run once per frame.
+        if self.durability <= 0:
+            self.game_over()
     #end update()
 
     def draw(self, screen):
