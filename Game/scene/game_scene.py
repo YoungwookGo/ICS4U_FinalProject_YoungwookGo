@@ -91,7 +91,7 @@ class GameScene(Scene):
 
         self.score = 0
         self.combo = 0
-        self.stage = 8
+        self.stage = 1
         self.energy = 0
 
         self.paused = False
