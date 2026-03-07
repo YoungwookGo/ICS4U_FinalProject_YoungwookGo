@@ -25,6 +25,8 @@ class TextBox:
     CURSOR_THICKNESS = 3
     CURSOR_GAP = 3
     CURSOR_INTERVAL = 0.5  # seconds
+    PLACEHOLDER_TEXT = "click and type here"
+    PLACEHOLDER_COLOR = (140, 140, 140)
 
     def __init__(self, font, size, text_color, idle_color, active_color, max_length=30):
         """
@@ -133,12 +135,19 @@ class TextBox:
         # Horizontal padding for text
         padding_x = self.DEFAULT_PADDING_X
 
-        # Draw text
+        # Always draw actual typed text first.
         text_surface = self.font.render(self.text, True, self.text_color)
         
         # Center text vertically inside the box
         text_y = self.rect.y + (self.rect.height - text_surface.get_height()) // 2
         screen.blit(text_surface, (self.rect.x + padding_x, text_y))
+
+        # When text is empty, draw placeholder as an overlay.
+        if self.text == "":
+            placeholder_surface = self.font.render(
+                self.PLACEHOLDER_TEXT, True, self.PLACEHOLDER_COLOR
+            )
+            screen.blit(placeholder_surface, (self.rect.x + padding_x, text_y))
 
         # Draw cursor after the text.
         if self.active and self.cursor_visible:

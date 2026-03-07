@@ -18,6 +18,7 @@ venv/
 
 # Project drafts
 Concept/
+DrawIO/
 
 # Miscellaneous
 Game/game_stats.json
