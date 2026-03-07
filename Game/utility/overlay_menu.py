@@ -153,15 +153,51 @@ class GuideOverlayMenu(OverlayMenu):
         # Guide content pages
         self.pages = [
             {
-                "title": "introduction",
+                "title": "How To Play",
                 "contents": [
-                "Word Defender is a simple game you can practice typing skill.",
+                    "Word Defender is a simple game you can practice typing skill.",
+                    "",
+                    "Type the same word shown on each enemy.",
+                    "Press Enter to attack your current target.",
+                    "",
+                    "Each kill gives score, combo, and energy gain.",
+                    "Enemies will get faster as the game progresses.",
+                    "Clear enemies before they reach the right side.",
                 ],
             },
             {
-                "title": "how to play",
+                "title": "Enemies",
                 "contents": [
-                "Type correct word shown in the game screen",
+                    "There is several different types of enemy with different feature.",
+                    "Enemy1: Basic enemy with normal speed. [80% spawn rate]",
+                    "Enemy2: Heavy enemy with more durability. [10% spawn rate]",
+                    "    - Provide bonus HP when killed.",
+                    "Enemy3: Quick enemy with high speed. [10% spawn rate]",
+                    "    - Provide bonus energy when killed",
+                    "",
+                    "Each enemy has a different base speed depending on its length.",
+                ],
+            },
+            {
+                "title": "Controls & HUD",
+                "contents": [
+                    "Type letters to fill the input box.",
+                    "Backspace removes one character.",
+                    "Enter submits typed text.",
+                    "ESC opens or closes the pause menu.",
+                    "",
+                    "Top HUD shows score, combo, kills, energy.",
+                ],
+            },
+            {
+                "title": "Gameplay Tips",
+                "contents": [
+                    "Managing combo and energy is a key to reach higher score.",
+                    "Try use your energy when you have high combo stack.",
+                    "",
+                    "You can sacrifise HP for saving energy or stacking combo.",
+                    "Never double-tap your skill. This is waste of energy.",
+                    "When waves get faster, prioritize easy words or blue words.",
                 ],
             },
         ]
