@@ -2,31 +2,15 @@
 # Program Name: WordDefender
 # Course:       ICS4U
 # Author:       Youngwook Go
-# Date:         2026-03-01
+# Date:         2026-03-04
 # File Name:    go_youngwook_final_WordDefender.py
 # Description:
 #   WordDefender is a real-time word typing challenge game.
-
-#   Game Overview:
-#   The player must type moving words correctly before they reach
-#   the right side of the screen. Different enemy types have unique
-#   behaviors such as increased speed, multiple health points, or
-#   special rewards. The game increases in difficulty over time.
-
-# Core Features:
-#   - Real-time typing input system
-#   - Multiple enemy types using inheritance
-#   - Dynamic speed calculation based on word length
-#   - Energy and health reward system
-#   - Scene management (Menu, Game, Over)
-#   - High score tracking and statistics saving
-
-# Programming Concepts Demonstrated:
-#   - OOP (Encapsulation, Inheritance, Polymorphism)
-#   - Sprite-based movement system
-#   - Scene/state management architecture
-#   - Event-driven input handling
-#   - File-based data persistence
+#   - The player must type moving words correctly 
+#     before they reach the right side of the screen. 
+#   - Different enemy types have unique behaviors 
+#     such as increased speed, or special rewards. 
+#   - The game increases in difficulty over time.
 # #####################################
 
 # Python library for building 2D games
