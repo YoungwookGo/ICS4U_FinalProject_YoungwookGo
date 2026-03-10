@@ -2,13 +2,13 @@
 # Class Name:   GameScene
 # Course:       ICS4U 
 # Author:       Youngwook Go 
-# Date:         2026-03-02
+# Date:         2026-03-05
 # File Name:    game_scene.py
 # Description:  
 #   GameScene is the main gameplay scene for the typing game.
 #    - Spawn and update moving word enemies using a Sprite Group.
 #    - Collect typing input through a TextBox and check against enemies.
-#    - Track gameplay stats (score, combo, kills, stage, energy, duration).
+#    - Track gameplay stats (score, combo, kills, stage, energy, durability).
 #    - Save statistics and high score when the game ends.
 # #####################################
 import pygame

@@ -1,3 +1,15 @@
+# #####################################
+# Class Name:   OverlayMenu -> PauseOverlayMenu(OverlayMenu),
+#                           -> GuideOverlayMenu(OverlayMenu),
+#               OverlayMenuManager
+#
+# Course:       ICS4U 
+# Author:       Youngwook Go 
+# Date:         2026-03-06
+# File Name:    overlay_menu.py 
+# Description:  
+#   This class manages overlay screen of Pause and Game Guide.
+##############################################
 import pygame
 
 from utility.button import Button
@@ -27,12 +39,16 @@ class OverlayMenu:
             centerx = self.scene.center_x,
             bottom = self.game.HEIGHT
         )
+    #end __init__()
 
     def handle_event(self, event):
         return None
+    #end handle_event()
 
     def draw(self, screen):
         screen.blit(self.overlay_screening, (0, 0))
+    #end draw()
+#end class OverlayMenu
 
 
 class PauseOverlayMenu(OverlayMenu):
@@ -100,6 +116,7 @@ class PauseOverlayMenu(OverlayMenu):
         self.scene.guide_button.locate(self.scene.center_x - 120, button_bar_y)
         self.gameover_button.locate(self.scene.center_x + 120, button_bar_y)
         self.continue_button.locate(self.scene.center_x + 360, button_bar_y)
+    #end __init__()
 
     def handle_event(self, event):
         if self.scene.quit_button.interact(event):
@@ -113,6 +130,7 @@ class PauseOverlayMenu(OverlayMenu):
         if event.type == pygame.KEYDOWN:
             return "resume_by_key"
         return None
+    #end handle_event()
 
     def draw(self, screen):
         super().draw(screen)
@@ -125,6 +143,8 @@ class PauseOverlayMenu(OverlayMenu):
         self.scene.guide_button.draw(screen)
         self.gameover_button.draw(screen)
         self.continue_button.draw(screen)
+    #end draw()
+#end class PauseOverlayMenu(OverlayMenu)
 
 
 class GuideOverlayMenu(OverlayMenu):
@@ -235,6 +255,7 @@ class GuideOverlayMenu(OverlayMenu):
         self.button_1.locate(self.scene.center_x - 240, button_bar_y)
         self.button_2.locate(self.scene.center_x, button_bar_y)
         self.button_3.locate(self.scene.center_x + 240, button_bar_y)
+    #end __init__()
 
     def _build_page_cache(self):
         """
@@ -271,6 +292,7 @@ class GuideOverlayMenu(OverlayMenu):
                 "content_blits": content_blits,
             })
         return cache
+    #end _build_page_cache()
 
     def _build_page_indicator(self):
         """
@@ -286,6 +308,7 @@ class GuideOverlayMenu(OverlayMenu):
             rect = surf.get_rect(center=center)
             indicator.append((surf, rect))
         return indicator
+    #end _build_page_indicator()
 
     def handle_event(self, event):
         if self.button_1.interact(event):
@@ -298,6 +321,7 @@ class GuideOverlayMenu(OverlayMenu):
         if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             return "back"
         return None
+    #end handle_event()
 
     def draw(self, screen):
         super().draw(screen)
@@ -317,6 +341,8 @@ class GuideOverlayMenu(OverlayMenu):
         self.button_1.draw(screen)
         self.button_2.draw(screen)
         self.button_3.draw(screen)
+    #end draw()
+#end class GuideOverlayMenu(OverlayMenu)
 
 class OverlayMenuManager:
     """
@@ -328,26 +354,34 @@ class OverlayMenuManager:
         self.scene = scene
         self.menus = {}
         self.active_name = None
+    #end __init__()
 
     def register(self, name, menu):
         self.menus[name] = menu
+    #end register()
 
     def open(self, name):
         if name in self.menus:
             self.active_name = name
+    #end open()
 
     def close(self):
         self.active_name = None
+    #end close()
 
     def is_open(self):
         return self.active_name is not None
+    #end is_open()
 
     def handle_event(self, event):
         if not self.is_open():
             return None
         return self.menus[self.active_name].handle_event(event)
+    #end handle_event()
 
     def draw(self, screen):
         if not self.is_open():
             return
         self.menus[self.active_name].draw(screen)
+    #end draw()
+#end class OverlayMenuManager

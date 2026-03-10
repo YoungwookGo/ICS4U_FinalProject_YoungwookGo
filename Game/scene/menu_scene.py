@@ -2,7 +2,7 @@
 # Class Name:   MenuScene
 # Course:       ICS4U 
 # Author:       Youngwook Go 
-# Date:         2026-03-02
+# Date:         2026-03-05
 # File Name:    menu_scene.py
 # Description:  
 #   MenuScene class is child class of Scene to handle the main menu screen.
@@ -28,7 +28,7 @@ class MenuScene(Scene):
         self.status = status
 
         if self.status == "GAMEOVER":
-            self._status_GAMEOVER()
+            self._status_gameover()
         else:
             self._status_neutral()
         # Initialize text surfaces
@@ -45,23 +45,34 @@ class MenuScene(Scene):
     #end __init__()
 
     def _status_neutral(self):
-        # Title text for neutral menu
+        """
+        Set title text for neutral menu
+        """
         self.title_text = "Word Defender"
+    #end _status_neutral()
 
-    def _status_GAMEOVER(self):
-        # Determine title text for game over menu
+    def _status_gameover(self):
+        """
+        Set the title text for the Game Over screen.
+
+        If the player's score is a new high score, the title will display
+        "New High Score!". Otherwise, it will display "Game Over!".
+        """
+
+        # Check whether the current score is a new high score
         if self.game.is_high_score:
             self.title_text = "New High Score!" 
         else:
             self.title_text = "Game Over!"
 
-        # Print score and high schore for game over menu
+        # Print score and high score for game over menu
         self.high_score_surface = self.content_font.render(
             f"High Score: {self.game.high_score}", True, self.TEXT_COLOR_LIGHT
         )
         self.score_surface = self.content_font.render(
             f"Your Score: {self.game.last_score}", True, self.TEXT_COLOR_LIGHT
         )
+    #end _status_gameover()
 
     def manage_event(self, events):
         """
@@ -131,14 +142,27 @@ class MenuScene(Scene):
     #end draw()
 
     def _draw_gameover(self, screen):
-        # Draw additional texts
+        """
+        Draw the score information on the Game Over screen.
+
+        This function displays the player's current score and the
+        highest score at the center of the screen.
+        """
+
+        # Create a rectangle for the current score text
+        # Position it slightly above the center of the screen
         score_rect = self.score_surface.get_rect(
             center=(self.center_x, self.center_y - 20)
         )
+
+        # Create a rectangle for the high score text
+        # Position it slightly below the center of the screen
         high_score_rect = self.high_score_surface.get_rect(
             center=(self.center_x, self.center_y + 25)
         )
 
+        # Draw the score and high score text onto the screen
         screen.blit(self.score_surface, score_rect)
         screen.blit(self.high_score_surface, high_score_rect)
+    #end _draw_gameover()
 #end class MenuScene

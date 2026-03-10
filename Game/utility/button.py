@@ -1,8 +1,8 @@
 # #####################################
-# Class Name:   Button
+# Class Name:   Button, IconButton
 # Course:       ICS4U 
 # Author:       Youngwook Go 
-# Date:         2026-03-01
+# Date:         2026-03-05
 # File Name:    button.py 
 # Description:  
 #   This class manages the button user interface,
@@ -80,6 +80,11 @@ class Button:
         text_rect.centery += self.TEXT_Y_OFFSET
         screen.blit(self.text_surface, text_rect)
     #end draw()
+#end class Button
 
 class IconButton(Button):
+    """
+    The icon is located in the top-right corner of the screen.
+    """
     TEXT_Y_OFFSET = 6
+#end class IconButton
